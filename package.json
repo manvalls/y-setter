@@ -1,0 +1,20 @@
+{
+  "name": "y-setter",
+  "version": "0.0.0",
+  "description": "Properties on which you can listen for changes",
+  "main": "main.js",
+  "dependencies": {
+    "u-su": "",
+    "y-resolver": ""
+  },
+  
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/manvalls/y-setter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/manvalls/y-setter/issues"
+  },
+  "author": "Manuel Valls Fernández <manolo@vlrz.es>",
+  "license": "LGPL-3.0"
+}
