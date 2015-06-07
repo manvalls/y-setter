@@ -7,7 +7,9 @@ var Su = require('u-su'),
     change = Su(),
     map = Su(),
     
-    Resolver,Setter,Getter,Hybrid,bag;
+    active = Su(),
+    
+    Resolver,Setter,Getter,Hybrid,bag,handle;
 
 // Setter
 
@@ -66,6 +68,26 @@ Setter.Getter = Getter = function Getter(prop){
   this[map] = {};
 };
 
+handleConn = walk.wrap(function*(getter,obj,prop,conn,f,that){
+  
+  if(f){
+    
+    do{
+      obj[prop] = f.call(that,getter[value],obj[prop],obj);
+      yield getter.change();
+    }while(conn[active]);
+    
+  }else{
+    
+    do{
+      obj[prop] = getter[value];
+      yield getter.change();
+    }while(conn[active]);
+    
+  }
+  
+});
+
 Object.defineProperties(Getter.prototype,{
   
   value: {
@@ -83,9 +105,33 @@ Object.defineProperties(Getter.prototype,{
     
     if(!this[change]) this[change] = new Resolver();
     return this[change].yielded;
+  }},
+  
+  connect: {value: function(obj,prop,f,that){
+    var conn = new Connection();
+    
+    if(prop == null || typeof prop == 'function'){
+      that = f;
+      f = prop;
+      prop = 'value' in obj ? 'value' : 'textContent';
+    }
+    
+    handleConn(this,obj,prop,conn,f,that);
+    
+    return conn;
   }}
   
 });
+
+// - Connection
+
+function Connection(){
+  this[active] = true;
+}
+
+Object.defineProperty(Connection.prototype,'disconnect',{value: function(){
+  this[active] = false;
+}});
 
 // Hybrid
 
