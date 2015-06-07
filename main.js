@@ -1,4 +1,5 @@
 var Su = require('u-su'),
+    walk = require('y-walk'),
     
     getter = Su(),
     inited = Su(),
