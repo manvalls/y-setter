@@ -1,5 +1,4 @@
 var Su = require('u-su'),
-    walk = require('y-walk'),
     
     getter = Su(),
     inited = Su(),
@@ -10,7 +9,8 @@ var Su = require('u-su'),
     
     active = Su(),
     
-    Resolver,Setter,Getter,Hybrid,bag,handle;
+    Resolver,walk,
+    Setter,Getter,Hybrid,bag,handle;
 
 // Setter
 
@@ -54,6 +54,7 @@ Object.defineProperties(Setter.prototype,bag = {
 });
 
 Resolver = require('y-resolver');
+walk = require('y-walk');
 
 // Getter
 
