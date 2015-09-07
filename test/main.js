@@ -1,6 +1,7 @@
 var t = require('u-test'),
     Cb = require('y-callback/all'),
     assert = require('assert'),
+    Resolver = require('y-resolver'),
     Setter = require('../main.js');
 
 t('Basic',function(){
@@ -225,6 +226,21 @@ t('Basic',function(){
     setter.value = 30;
 
     yield cb;
+  });
+
+  t('Getter constructor',function(){
+    var yd = (new Resolver()).yielded,
+        n = 0,
+        g = new Setter.Getter(
+          function(){ return n = n + 1; },
+          function(){ return yd; }
+        ),
+        tc,v;
+
+    tc = g.touched();
+    assert.notStrictEqual(g.value,g.value);
+    assert(!tc.done);
+
   });
 
 });
