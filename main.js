@@ -1,7 +1,4 @@
 var define = require('u-proto/define'),
-    Resolver = require('y-resolver'),
-    walk = require('y-walk'),
-    Detacher = require('detacher'),
 
     getY = Symbol(),
     getV = Symbol(),
@@ -10,6 +7,7 @@ var define = require('u-proto/define'),
     getter = Symbol(),
     resolver = Symbol(),
 
+    Resolver,walk,Detacher,
     Setter,Getter,bag;
 
 // Setter
@@ -226,3 +224,9 @@ Hybrid.prototype[define](bag);
 module.exports = Setter;
 Setter.Getter = Getter;
 Setter.Hybrid = Hybrid;
+
+/*/ imports /*/
+
+Resolver = require('y-resolver');
+walk = require('y-walk');
+Detacher = require('detacher');
