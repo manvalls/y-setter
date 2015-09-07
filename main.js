@@ -1,162 +1,228 @@
-var Su = require('u-su'),
-    
-    getter = Su(),
-    inited = Su(),
-    
-    value = Su(),
-    change = Su(),
-    map = Su(),
-    
-    active = Su(),
-    
-    Resolver,walk,
-    Setter,Getter,Hybrid,bag,handle;
+var define = require('u-proto/define'),
+    Resolver = require('y-resolver'),
+    walk = require('y-walk'),
+    Detacher = require('detacher'),
+
+    getY = Symbol(),
+    getV = Symbol(),
+
+    value = Symbol(),
+    getter = Symbol(),
+    resolver = Symbol(),
+
+    Setter,Getter,bag;
 
 // Setter
 
-module.exports = Setter = function Setter(Constructor){
-  Constructor = Constructor || Getter;
-  this[getter] = new Constructor();
-  this[getter][inited] = true;
+Setter = function(){
+  this[getter] = new Getter(getSV,[this],getSY,[this]);
 };
 
-Object.defineProperties(Setter.prototype,bag = {
-  
-  value: {
-    set: function(v){
-      var pv = this[getter][value],
-          res;
-      
-      this[getter][value] = v;
-      if(v != pv){
-        res = this[getter][change];
-        if(res){
-          delete this[getter][change];
-          res.accept();
-        }
-        
-        res = this[getter][map][v];
-        if(res){
-          delete this[getter][map][v];
-          res.accept();
-        }
-      }
-    },
-    get: function(){
-      return this[getter][value];
-    }
+Setter.prototype[define](bag = {
+
+  get value(){
+    return this[value];
   },
-  
-  getter: {get: function(){
+
+  set value(v){
+    var ov = this[value],
+        r;
+
+    this[value] = v;
+    if(ov !== v && this[resolver]){
+      r = this[resolver];
+      delete this[resolver];
+      r.accept();
+    }
+
+  },
+
+  get getter(){
     return this[getter];
-  }}
-  
+  },
+
+  writable: true
+
 });
 
-Resolver = require('y-resolver');
-walk = require('y-walk');
+// - utils
+
+function getSV(setter){
+  return setter[value];
+}
+
+function getSY(setter){
+  if(!setter[resolver]) setter[resolver] = new Resolver();
+  return setter[resolver].yielded;
+}
 
 // Getter
 
-Setter.Getter = Getter = function Getter(prop){
-  if(this[inited]) return;
-  
-  if(prop){
-    this[inited] = true;
-    this[prop] = Object.create(Setter.prototype);
-    this[prop][getter] = this;
+Getter = function(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
+
+  if(typeof gvArgs == 'function'){
+
+    gyThat = getYielded;
+    gyArgs = gvThat;
+    getYielded = gvArgs;
+
+    gvThat = null;
+    gvArgs = null;
+
+  }else if(typeof gvThat == 'function'){
+
+    gyThat = gyArgs;
+    gyArgs = getYielded;
+    getYielded = gvThat;
+
+    gvThat = null;
+
   }
-  
-  this[map] = {};
+
+  this[getY] = [
+    getYielded,
+    gyArgs || [],
+    gyThat || this
+  ];
+
+  this[getV] = [
+    getValue,
+    gvArgs || [],
+    gvThat || this
+  ];
+
 };
 
-handleConn = walk.wrap(function*(getter,obj,prop,conn,f,that){
-  
-  if(f){
-    
-    do{
-      obj[prop] = f.call(that,getter[value],obj[prop],obj);
-      yield getter.change();
-    }while(conn[active]);
-    
-  }else{
-    
-    do{
-      obj[prop] = getter[value];
-      yield getter.change();
-    }while(conn[active]);
-    
-  }
-  
-});
+Getter.prototype[define]({
 
-Object.defineProperties(Getter.prototype,{
-  
-  value: {
-    get: function(){
-      return this[value];
-    }
+  get value(){
+    var gv = this[getV];
+    return gv[0].apply(gv[2],gv[1]);
   },
-  
-  change: {value: function(v){
-    
-    if(arguments.length){
-      if(!this[map][v]) this[map][v] = new Resolver();
-      return this[map][v].yielded;
+
+  touched: function(){
+    var gy = this[getY];
+    return gy[0].apply(gy[2],gy[1]);
+  },
+
+  connect: function(obj,key){
+    if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
+    return this.watch(connect,obj,key);
+  },
+
+  to: function(){
+    var getters = [this],
+        i,trn,thisArg;
+
+    for(i = 0;i < arguments.length;i++){
+
+      if(typeof arguments[i] == 'function'){
+        trn = arguments[i];
+        thisArg = arguments[i + 1];
+        break;
+      }
+
+      getters.push(arguments[i]);
     }
-    
-    if(!this[change]) this[change] = new Resolver();
-    return this[change].yielded;
-  }},
-  
-  connect: {value: function(obj,prop,f,that){
-    var conn = new Connection();
-    
-    if(prop == null || typeof prop == 'function'){
-      that = f;
-      f = prop;
-      prop = 'value' in obj ? 'value' : 'textContent';
-    }
-    
-    handleConn(this,obj,prop,conn,f,that);
-    
-    return conn;
-  }}
-  
+
+    return new Getter(getTV,[getters,trn,thisArg],getTY,[getters]);
+  },
+
+  watch: function(cb){
+    var args = [],
+        dArgs = [],
+        d = new Detacher(pauseIt,dArgs),
+        i;
+
+    for(i = 1;i < arguments.length;i++) args[i + 2] = arguments[i];
+    args[2] = d;
+
+    walk(watchLoop,[args,cb,this,dArgs]);
+    return d;
+  },
+
+  writable: false
+
 });
 
-// - Connection
+// - utils
 
-function Connection(){
-  this[active] = true;
+function pauseIt(w){
+  w.pause();
 }
 
-Object.defineProperty(Connection.prototype,'disconnect',{value: function(){
-  this[active] = false;
-}});
+function* watchLoop(args,cb,that,dArgs){
+  var ov,v;
 
-// Hybrid
+  dArgs[0] = this;
 
-Setter.Hybrid = Hybrid = function Hybrid(){
-  this[getter] = this;
-  Getter.call(this);
-  
-  this[inited] = true;
-};
+  while(true){
 
-Hybrid.prototype = new Getter();
-Hybrid.prototype.constructor = Hybrid;
+    v = that.value;
+    args[0] = v;
+    args[1] = ov;
 
-Object.defineProperties(Hybrid.prototype,bag);
+    if(ov !== v) walk(cb,args,that);
 
-// Auxiliar functions
+    ov = v;
+    yield that.touched();
 
-Setter.chain = function(){
-  var last = arguments[arguments.length - 1][getter],
+  }
+
+}
+
+function getTY(getters){
+  var yds = [],
       i;
-  
-  arguments[arguments.length - 1][getter] = arguments[0][getter];
-  for(i = 0;i < arguments.length - 2;i++) arguments[i][getter] = arguments[i + 1][getter];
-  arguments[arguments.length - 2][getter] = last;
-};
 
+  for(i = 0;i < getters.length;i++){
+    yds[i] = getters[i].touched();
+  }
+
+  return Resolver.race(yds);
+}
+
+function getTV(getters,trn,thisArg){
+  var values = [],
+      i;
+
+  for(i = 0;i < getters.length;i++){
+    values[i] = getters[i].value;
+  }
+
+  return trn.apply(thisArg || this,values);
+}
+
+function connect(v,ov,d,obj,key){
+  obj[key] = v;
+}
+
+// HybridGetter
+
+function Hybrid(){
+
+  this[getY] = [
+    getSY,
+    [this],
+    this
+  ];
+
+  this[getV] = [
+    getSV,
+    [this],
+    this
+  ];
+
+  this[getter] = this;
+
+}
+
+Hybrid.prototype = Object.create(Getter.prototype);
+Hybrid.prototype[define]('constructor',Hybrid);
+Hybrid.prototype[define](bag);
+
+/*/ exports /*/
+
+module.exports = Setter;
+Setter.Getter = Getter;
+Setter.Hybrid = Hybrid;
