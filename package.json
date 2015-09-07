@@ -1,6 +1,6 @@
 {
   "name": "y-setter",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Properties on which you can listen for changes",
   "main": "main.js",
   "dependencies": {
@@ -9,7 +9,6 @@
     "y-walk": "",
     "detacher": ""
   },
-
   "devDependencies": {
     "u-test": "",
     "istanbul": "",
@@ -19,7 +18,6 @@
   "scripts": {
     "test": "bash test.sh"
   },
-
   "repository": {
     "type": "git",
     "url": "git://github.com/manvalls/y-setter.git"
