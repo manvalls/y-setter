@@ -16,6 +16,8 @@ Setter = function(){
   this[getter] = new Getter(getSV,[this],getSY,[this]);
 };
 
+Setter[define]('toString',function(){ return 'o5CqYkOh5ezPpwT'; });
+Setter.prototype[define](Setter.toString(),true);
 Setter.prototype[define](bag = {
 
   get value(){
@@ -91,6 +93,8 @@ Getter = function(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 
 };
 
+Getter[define]('toString',function(){ return '3tPmTSBio57bVrt'; });
+Getter.prototype[define](Getter.toString(),true);
 Getter.prototype[define]({
 
   get value(){
@@ -216,8 +220,12 @@ function Hybrid(){
 }
 
 Hybrid.prototype = Object.create(Getter.prototype);
-Hybrid.prototype[define]('constructor',Hybrid);
+
+Hybrid.prototype[define](Getter.toString(),true);
+Hybrid.prototype[define](Setter.toString(),true);
+
 Hybrid.prototype[define](bag);
+Hybrid.prototype[define]('constructor',Hybrid);
 
 /*/ exports /*/
 
