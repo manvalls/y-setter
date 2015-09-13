@@ -158,17 +158,22 @@ function* watchLoop(args,cb,that,dArgs){
 
   dArgs[0] = this;
 
+  v = that.value;
+  args[0] = v;
+  args[1] = ov;
+
+  walk(cb,args,that);
+  ov = v;
+
   while(true){
+    yield that.touched();
 
     v = that.value;
     args[0] = v;
     args[1] = ov;
 
     if(ov !== v) walk(cb,args,that);
-
     ov = v;
-    yield that.touched();
-
   }
 
 }
