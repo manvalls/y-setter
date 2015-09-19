@@ -2,11 +2,15 @@ var t = require('u-test'),
     Cb = require('y-callback/all'),
     assert = require('assert'),
     Resolver = require('y-resolver'),
-    Setter = require('../main.js');
+    Setter = require('../main.js'),
+    Getter = Setter.Getter;
 
 t('Basic',function(){
   var setter = new Setter(),
       getter = setter.getter;
+
+  assert(Getter.is(getter));
+  assert(Setter.is(setter));
 
   t('Value propagates from setter to getter',function(){
     var values = ['foo',5,{},Symbol()],

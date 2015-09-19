@@ -7,6 +7,9 @@ var define = require('u-proto/define'),
     getter = Symbol(),
     resolver = Symbol(),
 
+    isSetter = 'o5CqYkOh5ezPpwT',
+    isGetter = '3tPmTSBio57bVrt',
+
     Resolver,walk,Detacher,
     Setter,Getter,bag;
 
@@ -16,9 +19,9 @@ Setter = function(){
   this[getter] = new Getter(getSV,[this],getSY,[this]);
 };
 
-Setter[define]('toString',function(){ return 'o5CqYkOh5ezPpwT'; });
-Setter.prototype[define](Setter.toString(),true);
 Setter.prototype[define](bag = {
+
+  [isSetter]: true,
 
   get value(){
     return this[value];
@@ -54,6 +57,10 @@ function getSV(setter){
 function getSY(setter){
   if(!setter[resolver]) setter[resolver] = new Resolver();
   return setter[resolver].yielded;
+}
+
+function isSetterFn(obj){
+  return !!obj && obj[isSetter];
 }
 
 // Getter
@@ -93,9 +100,9 @@ Getter = function(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 
 };
 
-Getter[define]('toString',function(){ return '3tPmTSBio57bVrt'; });
-Getter.prototype[define](Getter.toString(),true);
 Getter.prototype[define]({
+
+  [isGetter]: true,
 
   get value(){
     var gv = this[getV];
@@ -148,6 +155,10 @@ Getter.prototype[define]({
 });
 
 // - utils
+
+function isGetterFn(obj){
+  return !!obj && obj[isGetter];
+}
 
 function pauseIt(w){
   w.pause();
@@ -226,9 +237,6 @@ function Hybrid(){
 
 Hybrid.prototype = Object.create(Getter.prototype);
 
-Hybrid.prototype[define](Getter.toString(),true);
-Hybrid.prototype[define](Setter.toString(),true);
-
 Hybrid.prototype[define](bag);
 Hybrid.prototype[define]('constructor',Hybrid);
 
@@ -237,6 +245,9 @@ Hybrid.prototype[define]('constructor',Hybrid);
 module.exports = Setter;
 Setter.Getter = Getter;
 Setter.Hybrid = Hybrid;
+
+Setter.is = isSetterFn;
+Getter.is = isGetterFn;
 
 /*/ imports /*/
 
