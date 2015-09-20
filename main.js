@@ -15,8 +15,9 @@ var define = require('u-proto/define'),
 
 // Setter
 
-Setter = function(){
+Setter = function(value){
   this[getter] = new Getter(getSV,[this],getSY,[this]);
+  this.value = value;
 };
 
 Setter.prototype[define](bag = {
@@ -217,7 +218,7 @@ function connect(v,ov,d,obj,key){
 
 // HybridGetter
 
-function Hybrid(){
+function Hybrid(value){
 
   this[getY] = [
     getSY,
@@ -232,7 +233,7 @@ function Hybrid(){
   ];
 
   this[getter] = this;
-
+  this.value = value;
 }
 
 Hybrid.prototype = Object.create(Getter.prototype);
