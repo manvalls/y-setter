@@ -110,6 +110,10 @@ Getter.prototype[define]({
     return gv[0].apply(gv[2],gv[1]);
   },
 
+  get: function(){
+    return new Getter(getProp,arguments,this,this[getY][0],this[getY][1],this[getY][2]);
+  },
+
   touched: function(){
     var gy = this[getY];
     return gy[0].apply(gy[2],gy[1]);
@@ -210,6 +214,14 @@ function getTV(getters,trn,thisArg){
   }
 
   return trn.apply(thisArg || this,values);
+}
+
+function getProp(){
+  var obj = this.value,
+      i;
+
+  for(i = 0;i < arguments.length;i++) obj = obj[arguments[i]];
+  return obj;
 }
 
 function connect(v,ov,d,obj,key){

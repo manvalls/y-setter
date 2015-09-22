@@ -211,6 +211,23 @@ t('Basic',function(){
 
   });
 
+  t('\'get\' works',function(){
+    var setter = new Setter(),
+        getter = setter.getter,
+        foo = getter.get('foo','foo'),
+        yd;
+
+    setter.value = {foo: {foo: 'bar'}};
+    assert.strictEqual(foo.value,'bar');
+
+    yd = foo.touched();
+    assert.strictEqual(yd.done,false);
+
+    setter.value = {foo: {foo: 'foo'}};
+    assert.strictEqual(yd.done,true);
+    assert.strictEqual(foo.value,'foo');
+  });
+
   t('Watch works',function*(){
     var ok = true,
         d,cb;
