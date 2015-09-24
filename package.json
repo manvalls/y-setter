@@ -7,7 +7,8 @@
     "u-proto": "",
     "y-resolver": "",
     "y-walk": "",
-    "detacher": ""
+    "detacher": "",
+    "y-timers": ""
   },
   "devDependencies": {
     "u-test": "",

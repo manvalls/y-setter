@@ -1,4 +1,5 @@
 var define = require('u-proto/define'),
+    wait = require('y-timers/wait'),
 
     getY = Symbol(),
     getV = Symbol(),
@@ -114,6 +115,10 @@ Getter.prototype[define]({
     return new Getter(getProp,arguments,this,this[getY][0],this[getY][1],this[getY][2]);
   },
 
+  debounce: function(timeout){
+    return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
+  },
+
   touched: function(){
     var gy = this[getY];
     return gy[0].apply(gy[2],gy[1]);
@@ -222,6 +227,28 @@ function getProp(){
 
   for(i = 0;i < arguments.length;i++) obj = obj[arguments[i]];
   return obj;
+}
+
+function getDeb(timeout,that){
+  var res;
+
+  if(!this[resolver]){
+    this[resolver] = res = new Resolver();
+    that.touched().listen(delayer,[this,timeout]);
+  }else res = this[resolver];
+
+  return res.yielded;
+}
+
+function delayer(that,timeout){
+  wait(timeout).listen(debListener,[that]);
+}
+
+function debListener(that){
+  var res = that[resolver];
+
+  delete that[resolver];
+  res.accept();
 }
 
 function connect(v,ov,d,obj,key){
