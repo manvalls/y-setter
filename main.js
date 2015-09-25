@@ -1,7 +1,4 @@
-var define = require('u-proto/define'),
-    wait = require('y-timers/wait'),
-
-    getY = Symbol(),
+var getY = Symbol(),
     getV = Symbol(),
 
     value = Symbol(),
@@ -11,12 +8,29 @@ var define = require('u-proto/define'),
     isSetter = 'o5CqYkOh5ezPpwT',
     isGetter = '3tPmTSBio57bVrt',
 
-    Resolver,walk,Detacher,
-    Setter,Getter,bag;
+    Resolver,walk,Detacher,define,wait,
+    bag;
+
+/*/ exports /*/
+
+module.exports = Setter;
+Setter.Getter = Getter;
+Setter.Hybrid = Hybrid;
+
+Setter.is = isSetterFn;
+Getter.is = isGetterFn;
+
+/*/ imports /*/
+
+Resolver = require('y-resolver');
+walk = require('y-walk');
+Detacher = require('detacher');
+define = require('u-proto/define');
+wait = require('y-timers/wait');
 
 // Setter
 
-Setter = function(value){
+function Setter(value){
   this[getter] = new Getter(getSV,[this],getSY,[this]);
   this.value = value;
 };
@@ -67,7 +81,7 @@ function isSetterFn(obj){
 
 // Getter
 
-Getter = function(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
+function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 
   if(typeof gvArgs == 'function'){
 
@@ -279,18 +293,3 @@ Hybrid.prototype = Object.create(Getter.prototype);
 
 Hybrid.prototype[define](bag);
 Hybrid.prototype[define]('constructor',Hybrid);
-
-/*/ exports /*/
-
-module.exports = Setter;
-Setter.Getter = Getter;
-Setter.Hybrid = Hybrid;
-
-Setter.is = isSetterFn;
-Getter.is = isGetterFn;
-
-/*/ imports /*/
-
-Resolver = require('y-resolver');
-walk = require('y-walk');
-Detacher = require('detacher');
