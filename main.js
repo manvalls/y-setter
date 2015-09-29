@@ -60,6 +60,10 @@ Setter.prototype[define](bag = {
     return this[getter];
   },
 
+  valueOf: function(){
+    return this.value;
+  },
+
   writable: true
 
 });
@@ -123,6 +127,10 @@ Getter.prototype[define]({
   get value(){
     var gv = this[getV];
     return gv[0].apply(gv[2],gv[1]);
+  },
+
+  valueOf: function(){
+    return this.value;
   },
 
   get: function(){

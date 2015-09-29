@@ -5,6 +5,7 @@ var t = require('u-test'),
     wait = require('y-timers/wait'),
     Setter = require('../main.js'),
     Getter = Setter.Getter,
+    Hybrid = Setter.Hybrid,
 
     setter = new Setter(),
     getter = setter.getter;
@@ -280,4 +281,13 @@ t('Getter constructor',function(){
   assert.notStrictEqual(g.value,g.value);
   assert(!tc.done);
 
+});
+
+t('valueOf',function(){
+  var h1 = new Hybrid(1),
+      h2 = new Hybrid(2),
+      s = new Setter(3),
+      g = s.getter;
+
+  assert.strictEqual(h1 + h2 + s + g,9);
 });
