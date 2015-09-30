@@ -141,10 +141,10 @@ t('\'to\' works',function(){
 
   });
 
-  t('Multiple hybrids',function(){
+  t('Multiple hybrids/non-getters',function(){
     var h1 = new Setter.Hybrid(),
         h2 = new Setter.Hybrid(),
-        dest = getter.to(h1,h2,function(v,v1,v2){ return Math.floor(v + v1 + v2); });
+        dest = getter.to(h1,h2,0,function(v,v1,v2,s){ return Math.floor(v + v1 + v2 + s); });
 
     t('Value propagates',function(){
       setter.value = 0;

@@ -226,7 +226,7 @@ function getTY(getters){
       i;
 
   for(i = 0;i < getters.length;i++){
-    yds[i] = getters[i].touched();
+    if(Getter.is(getters[i])) yds.push(getters[i].touched());
   }
 
   return Resolver.race(yds);
@@ -237,7 +237,8 @@ function getTV(getters,trn,thisArg){
       i;
 
   for(i = 0;i < getters.length;i++){
-    values[i] = getters[i].value;
+    if(Getter.is(getters[i])) values[i] = getters[i].value;
+    else values[i] = getters[i];
   }
 
   return trn.apply(thisArg || this,values);
