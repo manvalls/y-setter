@@ -99,11 +99,14 @@ t('\'connect\' works',function(){
 t('\'to\' works',function(){
 
   t('Single getter',function(){
-    var dest = getter.to(function(n){ return Math.floor(n + 1); });
+    var obj = {},
+        dest = getter.to(function(n){ return that = this,Math.floor(n + 1); },obj),
+        that;
 
     t('Value propagates',function(){
       setter.value = 0;
       assert.strictEqual(dest.value,1);
+      assert.strictEqual(that,obj);
     });
 
     t('\'touched\' works',function*(){

@@ -16,9 +16,10 @@ var getY = Symbol(),
 module.exports = Setter;
 Setter.Getter = Getter;
 Setter.Hybrid = Hybrid;
-
 Setter.is = isSetterFn;
+
 Getter.is = isGetterFn;
+Getter.transform = transform;
 
 /*/ imports /*/
 
@@ -166,7 +167,7 @@ Getter.prototype[define]({
       getters.push(arguments[i]);
     }
 
-    return new Getter(getTV,[getters,trn,thisArg],getTY,[getters]);
+    return transform(getters,trn,thisArg);
   },
 
   watch: function(cb){
@@ -190,6 +191,10 @@ Getter.prototype[define]({
 
 function isGetterFn(obj){
   return !!obj && obj[isGetter];
+}
+
+function transform(getters,func,thisArg){
+  return new Getter(getTV,[getters,func,thisArg],getTY,[getters]);
 }
 
 function pauseIt(w){
