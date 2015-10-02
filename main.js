@@ -20,6 +20,7 @@ Setter.is = isSetterFn;
 
 Getter.is = isGetterFn;
 Getter.transform = transform;
+Getter.concat = concat;
 
 /*/ imports /*/
 
@@ -135,7 +136,11 @@ Getter.prototype[define]({
   },
 
   get: function(){
-    return new Getter(getProp,arguments,this,this[getY][0],this[getY][1],this[getY][2]);
+    var getters = [this],
+        i;
+
+    for(i = 0;i < arguments.length;i++) getters.push(arguments[i]);
+    return transform(getters,getProp);
   },
 
   debounce: function(timeout){
@@ -183,7 +188,33 @@ Getter.prototype[define]({
     return d;
   },
 
-  writable: false
+  writable: false,
+
+  // Simple transforms
+
+  get not(){
+    return transform([this],invert);
+  },
+
+  get type(){
+    return transform([this],type);
+  },
+
+  is: function(v){
+    return transform([this,v],equal);
+  },
+
+  isNot: function(v){
+    return transform([this,v],notEqual);
+  },
+
+  equals: function(v){
+    return transform([this,v],strictEqual);
+  },
+
+  equalsNot: function(v){
+    return transform([this,v],strictNotEqual);
+  }
 
 });
 
@@ -193,9 +224,99 @@ function isGetterFn(obj){
   return !!obj && obj[isGetter];
 }
 
+// -- transform
+
 function transform(getters,func,thisArg){
   return new Getter(getTV,[getters,func,thisArg],getTY,[getters]);
 }
+
+function getTY(getters){
+  var yds = [],
+      i;
+
+  for(i = 0;i < getters.length;i++){
+    if(Getter.is(getters[i])) yds.push(getters[i].touched());
+  }
+
+  return Resolver.race(yds);
+}
+
+function getTV(getters,trn,thisArg){
+  var values = [],
+      i;
+
+  for(i = 0;i < getters.length;i++){
+    if(Getter.is(getters[i])) values[i] = getters[i].value;
+    else values[i] = getters[i];
+  }
+
+  return trn.apply(thisArg || this,values);
+}
+
+// -- Simple transforms
+
+function equal(v1,v2){ return v1 == v2; }
+function notEqual(v1,v2){ return v1 != v2; }
+function strictEqual(v1,v2){ return v1 === v2; }
+function strictNotEqual(v1,v2){ return v1 !== v2; }
+function invert(v){ return !v; }
+function type(v){ return typeof v; }
+
+// -- concat
+
+function concat(){
+  return transform(arguments,concatTf);
+}
+
+function concatTf(){
+  var result = '',
+      i;
+
+  for(i = 0;i < arguments.length;i++) result += arguments[i];
+  return result;
+}
+
+// -- get
+
+function getProp(){
+  var obj = arguments[0],
+      i;
+
+  for(i = 1;i < arguments.length;i++) obj = obj[arguments[i]];
+  return obj;
+}
+
+// -- debounce
+
+function getDeb(timeout,that){
+  var res;
+
+  if(!this[resolver]){
+    this[resolver] = res = new Resolver();
+    that.touched().listen(delayer,[this,timeout]);
+  }else res = this[resolver];
+
+  return res.yielded;
+}
+
+function delayer(that,timeout){
+  wait(timeout).listen(debListener,[that]);
+}
+
+function debListener(that){
+  var res = that[resolver];
+
+  delete that[resolver];
+  res.accept();
+}
+
+// -- connect
+
+function connect(v,ov,d,obj,key){
+  obj[key] = v;
+}
+
+// -- watch
 
 function pauseIt(w){
   w.pause();
@@ -224,63 +345,6 @@ function* watchLoop(args,cb,that,dArgs){
     ov = v;
   }
 
-}
-
-function getTY(getters){
-  var yds = [],
-      i;
-
-  for(i = 0;i < getters.length;i++){
-    if(Getter.is(getters[i])) yds.push(getters[i].touched());
-  }
-
-  return Resolver.race(yds);
-}
-
-function getTV(getters,trn,thisArg){
-  var values = [],
-      i;
-
-  for(i = 0;i < getters.length;i++){
-    if(Getter.is(getters[i])) values[i] = getters[i].value;
-    else values[i] = getters[i];
-  }
-
-  return trn.apply(thisArg || this,values);
-}
-
-function getProp(){
-  var obj = this.value,
-      i;
-
-  for(i = 0;i < arguments.length;i++) obj = obj[arguments[i]];
-  return obj;
-}
-
-function getDeb(timeout,that){
-  var res;
-
-  if(!this[resolver]){
-    this[resolver] = res = new Resolver();
-    that.touched().listen(delayer,[this,timeout]);
-  }else res = this[resolver];
-
-  return res.yielded;
-}
-
-function delayer(that,timeout){
-  wait(timeout).listen(debListener,[that]);
-}
-
-function debListener(that){
-  var res = that[resolver];
-
-  delete that[resolver];
-  res.accept();
-}
-
-function connect(v,ov,d,obj,key){
-  obj[key] = v;
 }
 
 // HybridGetter

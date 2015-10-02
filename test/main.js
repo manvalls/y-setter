@@ -294,3 +294,80 @@ t('valueOf',function(){
 
   assert.strictEqual(h1 + h2 + s + g,9);
 });
+
+t('concat',function(){
+  var h1 = new Hybrid(1),
+      h2 = new Hybrid(3),
+      c = Getter.concat(h1,2,h2);
+
+  assert.strictEqual(c.value,'123');
+  h1.value = '0';
+  assert.strictEqual(c.value,'023');
+  h2.value = 4;
+  assert.strictEqual(c.value,'024');
+});
+
+t('Simple transformers',function(){
+
+  t('is',function(){
+    var h = new Hybrid(undefined);
+
+    assert(h.is(null).value);
+    assert(h.is(undefined).value);
+
+    h.value = 5;
+    assert(h.is(5).value);
+    assert(h.is('5').value);
+  });
+
+  t('isNot',function(){
+    var h = new Hybrid(undefined);
+
+    assert(h.isNot(true).value);
+    assert(h.isNot(false).value);
+
+    h.value = 5;
+    assert(h.isNot(4).value);
+    assert(h.isNot('4').value);
+  });
+
+  t('equals',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.equals(null).value);
+    assert(h.equals(undefined).value);
+
+    h.value = 5;
+    assert(h.equals(5).value);
+    assert(!h.equals('5').value);
+  });
+
+  t('equalsNot',function(){
+    var h = new Hybrid(undefined);
+
+    assert(h.equalsNot(null).value);
+    assert(!h.equalsNot(undefined).value);
+
+    h.value = 5;
+    assert(!h.equalsNot(5).value);
+    assert(h.equalsNot('5').value);
+  });
+
+  t('type',function(){
+    var h = new Hybrid(undefined);
+
+    assert.strictEqual(h.type.value,'undefined');
+
+    h.value = 5;
+    assert.strictEqual(h.type.value,'number');
+  });
+
+  t('not',function(){
+    var h = new Hybrid(undefined);
+
+    assert(h.not.value);
+    h.value = true;
+    assert(!h.not.value);
+  });
+
+});
