@@ -370,4 +370,52 @@ t('Simple transformers',function(){
     assert(!h.not.value);
   });
 
+  t('gt',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.gt(0).value);
+    assert(!h.gt(undefined).value);
+
+    h.value = 5;
+    assert(h.gt(4).value);
+    assert(!h.gt(5).value);
+    assert(!h.gt(6).value);
+  });
+
+  t('ge',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.ge(0).value);
+    assert(!h.ge(undefined).value);
+
+    h.value = 5;
+    assert(h.ge(4).value);
+    assert(h.ge(5).value);
+    assert(!h.ge(6).value);
+  });
+
+  t('lt',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.lt(0).value);
+    assert(!h.lt(undefined).value);
+
+    h.value = 5;
+    assert(!h.lt(4).value);
+    assert(!h.lt(5).value);
+    assert(h.lt(6).value);
+  });
+
+  t('le',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.le(0).value);
+    assert(!h.le(undefined).value);
+
+    h.value = 5;
+    assert(!h.le(4).value);
+    assert(h.le(5).value);
+    assert(h.le(6).value);
+  });
+
 });

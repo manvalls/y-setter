@@ -214,6 +214,22 @@ Getter.prototype[define]({
 
   equalsNot: function(v){
     return transform([this,v],strictNotEqual);
+  },
+
+  lt: function(v){
+    return transform([this,v],lt);
+  },
+
+  le: function(v){
+    return transform([this,v],le);
+  },
+
+  gt: function(v){
+    return transform([this,v],gt);
+  },
+
+  ge: function(v){
+    return transform([this,v],ge);
   }
 
 });
@@ -259,8 +275,14 @@ function equal(v1,v2){ return v1 == v2; }
 function notEqual(v1,v2){ return v1 != v2; }
 function strictEqual(v1,v2){ return v1 === v2; }
 function strictNotEqual(v1,v2){ return v1 !== v2; }
+
 function invert(v){ return !v; }
 function type(v){ return typeof v; }
+
+function lt(v1,v2){ return v1 < v2; }
+function le(v1,v2){ return v1 <= v2; }
+function gt(v1,v2){ return v1 > v2; }
+function ge(v1,v2){ return v1 >= v2; }
 
 // -- concat
 
