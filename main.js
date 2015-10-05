@@ -192,45 +192,21 @@ Getter.prototype[define]({
 
   // Simple transforms
 
-  get not(){
-    return transform([this],invert);
-  },
+  get not(){ return transform([this],invert); },
+  get type(){ return transform([this],type); },
 
-  get type(){
-    return transform([this],type);
-  },
+  is: function(v){ return transform([this,v],equal); },
+  isNot: function(v){ return transform([this,v],notEqual); },
+  equals: function(v){ return transform([this,v],strictEqual); },
+  equalsNot: function(v){ return transform([this,v],strictNotEqual); },
 
-  is: function(v){
-    return transform([this,v],equal);
-  },
+  lt: function(v){ return transform([this,v],lt); },
+  le: function(v){ return transform([this,v],le); },
+  gt: function(v){ return transform([this,v],gt); },
+  ge: function(v){ return transform([this,v],ge); },
 
-  isNot: function(v){
-    return transform([this,v],notEqual);
-  },
-
-  equals: function(v){
-    return transform([this,v],strictEqual);
-  },
-
-  equalsNot: function(v){
-    return transform([this,v],strictNotEqual);
-  },
-
-  lt: function(v){
-    return transform([this,v],lt);
-  },
-
-  le: function(v){
-    return transform([this,v],le);
-  },
-
-  gt: function(v){
-    return transform([this,v],gt);
-  },
-
-  ge: function(v){
-    return transform([this,v],ge);
-  }
+  and: function(v){ return transform([this,v],and); },
+  or: function(v){ return transform([this,v],or); }
 
 });
 
@@ -283,6 +259,9 @@ function lt(v1,v2){ return v1 < v2; }
 function le(v1,v2){ return v1 <= v2; }
 function gt(v1,v2){ return v1 > v2; }
 function ge(v1,v2){ return v1 >= v2; }
+
+function and(v1,v2){ return v1 && v2; }
+function or(v1,v2){ return v1 || v2; }
 
 // -- concat
 

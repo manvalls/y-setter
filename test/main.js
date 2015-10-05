@@ -418,4 +418,26 @@ t('Simple transformers',function(){
     assert(h.le(6).value);
   });
 
+  t('and',function(){
+    var h = new Hybrid(undefined);
+
+    assert(!h.and(true).value);
+    assert(!h.and(false).value);
+
+    h.value = true;
+    assert(h.and(true).value);
+    assert(!h.and(false).value);
+  });
+
+  t('or',function(){
+    var h = new Hybrid(undefined);
+
+    assert(h.or(true).value);
+    assert(!h.or(false).value);
+
+    h.value = true;
+    assert(h.or(true).value);
+    assert(h.or(false).value);
+  });
+
 });
