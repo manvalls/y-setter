@@ -188,6 +188,19 @@ Getter.prototype[define]({
     return d;
   },
 
+  glance: function(cb){
+    var args = [],
+        dArgs = [],
+        d = new Detacher(pauseIt,dArgs),
+        i;
+
+    for(i = 1;i < arguments.length;i++) args[i + 2] = arguments[i];
+    args[2] = d;
+
+    walk(glanceLoop,[args,cb,this,dArgs]);
+    return d;
+  },
+
   writable: false,
 
   // Simple transforms
@@ -317,13 +330,40 @@ function connect(v,ov,d,obj,key){
   obj[key] = v;
 }
 
-// -- watch
+// -- watch and glance
 
 function pauseIt(w){
   w.pause();
 }
 
 function* watchLoop(args,cb,that,dArgs){
+  var ov,v,yd;
+
+  dArgs[0] = this;
+
+  v = that.value;
+  args[0] = v;
+  args[1] = ov;
+
+  yd = that.touched();
+  walk(cb,args,that);
+  ov = v;
+
+  while(true){
+    yield yd;
+
+    v = that.value;
+    args[0] = v;
+    args[1] = ov;
+
+    yd = that.touched();
+    if(ov !== v) walk(cb,args,that);
+    ov = v;
+  }
+
+}
+
+function* glanceLoop(args,cb,that,dArgs){
   var ov,v;
 
   dArgs[0] = this;
@@ -333,7 +373,7 @@ function* watchLoop(args,cb,that,dArgs){
   args[1] = ov;
 
   walk(cb,args,that);
-  ov = v;
+  ov = that.value;
 
   while(true){
     yield that.touched();
@@ -343,7 +383,7 @@ function* watchLoop(args,cb,that,dArgs){
     args[1] = ov;
 
     if(ov !== v) walk(cb,args,that);
-    ov = v;
+    ov = that.value;
   }
 
 }

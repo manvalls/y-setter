@@ -253,6 +253,55 @@ t('\'watch\' works',function*(){
   yield cb;
 });
 
+t('watch vs glance',function*(){
+  var setter = new Setter(0),
+      getter = setter.getter,
+      obj = {},
+      g,cb,conn,lv;
+
+  conn = getter.watch(cb = Cb(function(v){
+    if(v < 5) setter.value++;
+  }));
+
+  assert.strictEqual(getter.value,5);
+  yield cb;
+  conn.detach();
+  conn = null;
+  setter.value = 0;
+
+  conn = getter.glance(cb = Cb(function(v,ov,c,o){
+    assert.strictEqual(o,obj);
+    if(conn) assert.strictEqual(c,conn);
+    if(v < 5){
+      assert.strictEqual(lv,ov);
+      setter.value++;
+    }
+  }),obj);
+
+  assert.strictEqual(getter.value,1);
+  lv = getter.value;
+  setter.value = 1;
+  assert.strictEqual(getter.value,1);
+  lv = getter.value;
+  setter.value = 2;
+  assert.strictEqual(getter.value,3);
+  yield cb;
+  conn.detach();
+  setter.value = 0;
+
+  (g = getter.to( v => parseInt(v) )).glance(cb = Cb(function(v){
+    if(v < 5) setter.value++;
+  }));
+
+  assert.strictEqual(g.value,1);
+  setter.value = '1';
+  assert.strictEqual(g.value,1);
+  setter.value = 2;
+  assert.strictEqual(g.value,3);
+  yield cb;
+
+});
+
 t('\'debounce\' works',function*(){
   var setter = new Setter(),
       getter = setter.getter.debounce(0),
