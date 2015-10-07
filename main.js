@@ -219,7 +219,12 @@ Getter.prototype[define]({
   ge: function(v){ return transform([this,v],ge); },
 
   and: function(v){ return transform([this,v],and); },
-  or: function(v){ return transform([this,v],or); }
+  or: function(v){ return transform([this,v],or); },
+
+  isA: function(v){ return transform([this,v],isA); },
+  isAn: function(v){ return transform([this,v],isA); },
+  isNotA: function(v){ return transform([this,v],isNotA); },
+  isNotAn: function(v){ return transform([this,v],isNotA); }
 
 });
 
@@ -275,6 +280,9 @@ function ge(v1,v2){ return v1 >= v2; }
 
 function and(v1,v2){ return v1 && v2; }
 function or(v1,v2){ return v1 || v2; }
+
+function isA(v1,v2){ return v1 instanceof v2; }
+function isNotA(v1,v2){ return !(v1 instanceof v2); }
 
 // -- concat
 

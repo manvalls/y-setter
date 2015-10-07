@@ -489,4 +489,15 @@ t('Simple transformers',function(){
     assert(h.or(false).value);
   });
 
+  t('isA / isAn',function(){
+    var h = new Hybrid([]);
+
+    assert(h.isAn(Array).value);
+    assert(h.isNotA(Date).value);
+
+    h.value = new Date();
+    assert(h.isNotAn(Array).value);
+    assert(h.isA(Date).value);
+  });
+
 });
