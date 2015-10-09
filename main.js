@@ -218,6 +218,7 @@ Getter.prototype[define]({
   gt: function(v){ return transform([this,v],gt); },
   ge: function(v){ return transform([this,v],ge); },
 
+  iif: function(vt,vf){ return transform([this,vt,vf],iif); },
   and: function(v){ return transform([this,v],and); },
   or: function(v){ return transform([this,v],or); },
 
@@ -278,6 +279,7 @@ function le(v1,v2){ return v1 <= v2; }
 function gt(v1,v2){ return v1 > v2; }
 function ge(v1,v2){ return v1 >= v2; }
 
+function iif(v,vt,vf){ return v ? vt : vf; }
 function and(v1,v2){ return v1 && v2; }
 function or(v1,v2){ return v1 || v2; }
 

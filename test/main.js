@@ -467,6 +467,17 @@ t('Simple transformers',function(){
     assert(h.le(6).value);
   });
 
+  t('iif',function(){
+    var h = new Hybrid(undefined);
+
+    assert.strictEqual(h.iif('foo','bar').value,'bar');
+    assert.strictEqual(h.not.iif('foo','bar').value,'foo');
+
+    h.value = true;
+    assert.strictEqual(h.not.iif('foo','bar').value,'bar');
+    assert.strictEqual(h.iif('foo','bar').value,'foo');
+  });
+
   t('and',function(){
     var h = new Hybrid(undefined);
 
