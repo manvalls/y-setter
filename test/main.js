@@ -511,4 +511,40 @@ t('Simple transformers',function(){
     assert(h.isA(Date).value);
   });
 
+  t('mb',function(){
+    var h = new Hybrid(0);
+
+    assert.strictEqual(h.mb(5).value,0);
+    assert.strictEqual(h.mb(0).value,0);
+
+    h.value = 2;
+    assert.strictEqual(h.mb(5).value,10);
+    assert.strictEqual(h.mb(0).value,0);
+
+    h.value = 1;
+    assert.strictEqual(h.mb(5).value,5);
+    assert.strictEqual(h.mb(0).value,0);
+  });
+
+  t('db',function(){
+    var h = new Hybrid(6);
+
+    assert.strictEqual(h.db(2).value,3);
+    assert.strictEqual(h.db(3).value,2);
+  });
+
+  t('add',function(){
+    var h = new Hybrid(6);
+
+    assert.strictEqual(h.add(2).value,8);
+    assert.strictEqual(h.add(3).value,9);
+  });
+
+  t('subs',function(){
+    var h = new Hybrid(6);
+
+    assert.strictEqual(h.subs(2).value,4);
+    assert.strictEqual(h.subs(3).value,3);
+  });
+
 });
