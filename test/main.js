@@ -548,3 +548,14 @@ t('Simple transformers',function(){
   });
 
 });
+
+t('One-argument constructor',function(){
+  var getter = Getter(5);
+
+  assert.strictEqual(getter.value,5);
+  assert(!getter.touched().done);
+
+  getter = new Getter('foo');
+  assert.strictEqual(getter.value,'foo');
+  assert(!getter.touched().done);
+});

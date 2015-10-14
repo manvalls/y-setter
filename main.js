@@ -89,6 +89,9 @@ function isSetterFn(obj){
 
 function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 
+  if(arguments.length == 1)
+    return new Getter(through,[arguments[0]],through,[(new Resolver()).yielded]);
+
   if(typeof gvArgs == 'function'){
 
     gyThat = getYielded;
@@ -239,6 +242,8 @@ Getter.prototype[define]({
 function isGetterFn(obj){
   return !!obj && obj[isGetter];
 }
+
+function through(v){ return v; }
 
 // -- transform
 
