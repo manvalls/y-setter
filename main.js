@@ -146,6 +146,14 @@ Getter.prototype[define]({
     return transform(getters,getProp);
   },
 
+  run: function(){
+    var getters = [this],
+        i;
+
+    for(i = 0;i < arguments.length;i++) getters.push(arguments[i]);
+    return transform(getters,runIt);
+  },
+
   debounce: function(timeout){
     return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
   },
@@ -313,6 +321,18 @@ function concatTf(){
 
   for(i = 0;i < arguments.length;i++) result += arguments[i];
   return result;
+}
+
+// -- run and call
+
+function runIt(){
+  var obj = arguments[0],
+      func = obj[arguments[1]],
+      args = [],
+      i;
+
+  for(i = 2;i < arguments.length;i++) args.push(arguments[i]);
+  return func.apply(obj,args);
 }
 
 // -- get

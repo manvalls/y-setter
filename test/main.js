@@ -356,6 +356,15 @@ t('concat',function(){
   assert.strictEqual(c.value,'024');
 });
 
+t('run',function(){
+  var setter = new Setter([1,2,3]),
+      getter = setter.getter.run('filter',n => n > 1);
+
+  assert.deepStrictEqual(getter.value,[2,3]);
+  setter.value = [1,1,1,0,1,5,6,0,1,7];
+  assert.deepStrictEqual(getter.value,[5,6,7]);
+});
+
 t('Simple transformers',function(){
 
   t('is',function(){
