@@ -45,17 +45,18 @@ Setter.prototype[define](bag = {
     return this[value];
   },
 
+  touch: function(){
+    var r = this[resolver];
+    delete this[resolver];
+    r.accept();
+  },
+
   set value(v){
     var ov = this[value],
         r;
 
     this[value] = v;
-    if(ov !== v && this[resolver]){
-      r = this[resolver];
-      delete this[resolver];
-      r.accept();
-    }
-
+    if(ov !== v && this[resolver]) this.touch();
   },
 
   get getter(){
