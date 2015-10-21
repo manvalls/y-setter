@@ -9,7 +9,7 @@ var getY = Symbol(),
     isGetter = '3tPmTSBio57bVrt',
 
     Resolver,walk,Detacher,define,wait,
-    bag;
+    bag,Yielded;
 
 /*/ exports /*/
 
@@ -25,6 +25,7 @@ Getter.concat = concat;
 /*/ imports /*/
 
 Resolver = require('y-resolver');
+Yielded = Resolver.Yielded;
 walk = require('y-walk');
 Detacher = require('detacher');
 define = require('u-proto/define');
@@ -47,16 +48,16 @@ Setter.prototype[define](bag = {
 
   touch: function(){
     var r = this[resolver];
+
+    if(!r) return;
     delete this[resolver];
     r.accept();
   },
 
   set value(v){
-    var ov = this[value],
-        r;
-
+    var ov = this[value];
     this[value] = v;
-    if(ov !== v && this[resolver]) this.touch();
+    if(ov !== v) this.touch();
   },
 
   get getter(){
@@ -129,6 +130,10 @@ function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 Getter.prototype[define]({
 
   [isGetter]: true,
+
+  [Yielded.getter]: function(){
+    return walk(getYielded,[this]);
+  },
 
   get value(){
     var gv = this[getV];
@@ -250,6 +255,10 @@ Getter.prototype[define]({
 
 function isGetterFn(obj){
   return !!obj && obj[isGetter];
+}
+
+function* getYielded(getter){
+  while(!getter.value) yield getter.touched();
 }
 
 function through(v){ return v; }

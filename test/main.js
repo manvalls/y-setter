@@ -3,6 +3,7 @@ var t = require('u-test'),
     assert = require('assert'),
     Resolver = require('y-resolver'),
     wait = require('y-timers/wait'),
+    walk = require('y-walk'),
     Setter = require('../main.js'),
     Getter = Setter.Getter,
     Hybrid = Setter.Hybrid,
@@ -567,4 +568,23 @@ t('One-argument constructor',function(){
   getter = new Getter('foo');
   assert.strictEqual(getter.value,'foo');
   assert(!getter.touched().done);
+});
+
+t('Yielded getter',function(){
+  var setter = new Setter(),
+      getter = setter.getter,
+      ok = false;
+
+  walk(function*(){
+    yield getter.is(5);
+    ok = true;
+  });
+
+  setter.value = 0;
+  assert(!ok);
+  setter.value = 'foo';
+  assert(!ok);
+  setter.value = 5;
+  assert(ok);
+
 });
