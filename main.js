@@ -60,6 +60,10 @@ Setter.prototype[define](bag = {
     if(ov !== v) this.touch();
   },
 
+  set: function(v){
+    this.value = v;
+  },
+
   get getter(){
     return this[getter];
   },
@@ -145,9 +149,10 @@ Getter.prototype[define]({
   },
 
   get: function(){
-    var getters = [this],
-        i;
+    var getters,i;
+    if(!arguments.length) return this.value;
 
+    getters = [this];
     for(i = 0;i < arguments.length;i++) getters.push(arguments[i]);
     return transform(getters,getProp);
   },
@@ -235,8 +240,8 @@ Getter.prototype[define]({
   gt: function(v){ return transform([this,v],gt); },
   ge: function(v){ return transform([this,v],ge); },
 
-  add: function(v){ return transform([this,v],add); },
-  subs: function(v){ return transform([this,v],substract); },
+  pl: function(v){ return transform([this,v],add); },
+  mn: function(v){ return transform([this,v],substract); },
   mb: function(v){ return transform([this,v],multiplyBy); },
   db: function(v){ return transform([this,v],divideBy); },
 

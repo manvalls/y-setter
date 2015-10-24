@@ -23,7 +23,7 @@ t('Value propagates from setter to getter',function(){
     setter.value = values[i];
   }
 
-  assert.strictEqual(setter.value,getter.value);
+  assert.strictEqual(setter.value,getter.get());
 });
 
 t('Setter is writable',function(){
@@ -543,18 +543,18 @@ t('Simple transformers',function(){
     assert.strictEqual(h.db(3).value,2);
   });
 
-  t('add',function(){
+  t('pl',function(){
     var h = new Hybrid(6);
 
-    assert.strictEqual(h.add(2).value,8);
-    assert.strictEqual(h.add(3).value,9);
+    assert.strictEqual(h.pl(2).value,8);
+    assert.strictEqual(h.pl(3).value,9);
   });
 
-  t('subs',function(){
+  t('mn',function(){
     var h = new Hybrid(6);
 
-    assert.strictEqual(h.subs(2).value,4);
-    assert.strictEqual(h.subs(3).value,3);
+    assert.strictEqual(h.mn(2).value,4);
+    assert.strictEqual(h.mn(3).value,3);
   });
 
 });
@@ -580,11 +580,11 @@ t('Yielded getter',function(){
     ok = true;
   });
 
-  setter.value = 0;
+  setter.set(0);
   assert(!ok);
-  setter.value = 'foo';
+  setter.set('foo');
   assert(!ok);
-  setter.value = 5;
+  setter.set(5);
   assert(ok);
 
 });
