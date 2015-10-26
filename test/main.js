@@ -366,6 +366,15 @@ t('run',function(){
   assert.deepStrictEqual(getter.value,[5,6,7]);
 });
 
+t('call',function(){
+  var setter = new Setter(function(v1,v2){ return v1 + v2; }),
+      getter = setter.getter.call(1,2);
+
+  assert.strictEqual(getter.value,3);
+  setter.value = function(v1,v2){ return v1 - v2; };
+  assert.strictEqual(getter.value,-1);
+});
+
 t('Simple transformers',function(){
 
   t('is',function(){

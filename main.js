@@ -165,6 +165,14 @@ Getter.prototype[define]({
     return transform(getters,runIt);
   },
 
+  call: function(){
+    var getters = [this],
+        i;
+
+    for(i = 0;i < arguments.length;i++) getters.push(arguments[i]);
+    return transform(getters,callIt);
+  },
+
   debounce: function(timeout){
     return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
   },
@@ -348,6 +356,15 @@ function runIt(){
 
   for(i = 2;i < arguments.length;i++) args.push(arguments[i]);
   return func.apply(obj,args);
+}
+
+function callIt(){
+  var func = arguments[0],
+      args = [],
+      i;
+
+  for(i = 1;i < arguments.length;i++) args.push(arguments[i]);
+  return func.apply(this,args);
 }
 
 // -- get
