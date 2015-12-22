@@ -1,7 +1,9 @@
 var getY = Symbol(),
     getV = Symbol(),
+    getF = Symbol(),
 
     value = Symbol(),
+    frozen = Symbol(),
     getter = Symbol(),
     resolver = Symbol(),
 
@@ -34,7 +36,8 @@ wait = require('y-timers/wait');
 // Setter
 
 function Setter(value){
-  this[getter] = new Getter(getSV,[this],getSY,[this]);
+  this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
+  this[frozen] = new Resolver();
   this.value = value;
 };
 
@@ -46,18 +49,25 @@ Setter.prototype[define](bag = {
     return this[value];
   },
 
+  set value(v){
+    var ov;
+
+    if(this[frozen].yielded.done) return;
+    ov = this[value];
+    this[value] = v;
+    if(ov !== v) this.touch();
+  },
+
+  freeze: function(){
+    this[frozen].accept();
+  },
+
   touch: function(){
     var r = this[resolver];
 
     if(!r) return;
     delete this[resolver];
     r.accept();
-  },
-
-  set value(v){
-    var ov = this[value];
-    this[value] = v;
-    if(ov !== v) this.touch();
   },
 
   set: function(v){
@@ -87,19 +97,26 @@ function getSY(setter){
   return setter[resolver].yielded;
 }
 
+function getSF(setter){
+  return setter[frozen].yielded;
+}
+
 function isSetterFn(obj){
   return !!obj && obj[isSetter];
 }
 
 // Getter
 
-function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
+function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat,getFrozen,gfArgs,gfThat){
 
   if(arguments.length == 1)
     return new Getter(through,[arguments[0]],through,[(new Resolver()).yielded]);
 
   if(typeof gvArgs == 'function'){
 
+    gfThat = getFrozen;
+    gfArgs = gyThat;
+    getFrozen = gyArgs;
     gyThat = getYielded;
     gyArgs = gvThat;
     getYielded = gvArgs;
@@ -109,11 +126,33 @@ function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
 
   }else if(typeof gvThat == 'function'){
 
+    gfThat = gfArgs;
+    gfArgs = getFrozen;
+    getFrozen = gyThat;
     gyThat = gyArgs;
     gyArgs = getYielded;
     getYielded = gvThat;
 
     gvThat = null;
+
+  }
+
+  if(typeof gyArgs == 'function'){
+
+    gfThat = getFrozen;
+    gfArgs = gyThat;
+    getFrozen = gyArgs;
+
+    gyThat = null;
+    gyArgs = null;
+
+  }else if(typeof gyThat == 'function'){
+
+    gfThat = gfArgs;
+    gfArgs = getFrozen;
+    getFrozen = gyThat;
+
+    gyThat = null;
 
   }
 
@@ -129,6 +168,12 @@ function Getter(getValue,gvArgs,gvThat,getYielded,gyArgs,gyThat){
     gvThat || this
   ];
 
+  this[getF] = [
+    getFrozen || retYd,
+    gfArgs || [],
+    gfThat || this
+  ];
+
 };
 
 Getter.prototype[define]({
@@ -142,6 +187,11 @@ Getter.prototype[define]({
   get value(){
     var gv = this[getV];
     return gv[0].apply(gv[2],gv[1]);
+  },
+
+  frozen: function(){
+    var gf = this[getF];
+    return gf[0].apply(gf[2],gf[1]);
   },
 
   valueOf: function(){
@@ -275,11 +325,12 @@ function* getYielded(getter){
 }
 
 function through(v){ return v; }
+function retYd(){ return (new Resolver()).yielded; }
 
 // -- transform
 
 function transform(getters,func,thisArg){
-  return new Getter(getTV,[getters,func,thisArg],getTY,[getters]);
+  return new Getter(getTV,[getters,func,thisArg],getTY,[getters],getTF,[getters]);
 }
 
 function getTY(getters){
@@ -303,6 +354,17 @@ function getTV(getters,trn,thisArg){
   }
 
   return trn.apply(thisArg || this,values);
+}
+
+function getTF(getters){
+  var yds = [],
+      i;
+
+  for(i = 0;i < getters.length;i++){
+    if(Getter.is(getters[i])) yds.push(getters[i].frozen());
+  }
+
+  return Resolver.all(yds);
 }
 
 // -- Simple transforms
@@ -481,7 +543,14 @@ function Hybrid(value){
     this
   ];
 
+  this[getF] = [
+    getSF,
+    [this],
+    this
+  ];
+
   this[getter] = this;
+  this[frozen] = new Resolver();
   this.value = value;
 }
 

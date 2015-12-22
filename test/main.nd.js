@@ -597,3 +597,43 @@ t('Yielded getter',function(){
   assert(ok);
 
 });
+
+t('"freeze" and "frozen"',function(){
+  var h = new Hybrid(),
+      g,s1,s2,joined;
+
+  h.value = 'foo';
+  assert.strictEqual(h.value,'foo');
+  assert(!h.frozen().done);
+
+  h.freeze();
+  h.value = 'bar';
+  assert.strictEqual(h.value,'foo');
+  assert(h.frozen().done);
+
+  g = new Getter(() => 5,() => (new Resolver()).yielded,() => Resolver.accept());
+  assert(g.frozen().done);
+  assert(!g.touched().done);
+  assert.strictEqual(g.value,5);
+
+  g = new Getter(() => 5,() => (new Resolver()).yielded);
+  assert(!g.frozen().done);
+  assert(!g.touched().done);
+  assert.strictEqual(g.value,5);
+
+  s1 = new Setter(0);
+  s2 = new Setter(1);
+  joined = s1.getter.pl(s2.getter).pl(2);
+
+  assert.strictEqual(joined.value,3);
+  assert(!joined.frozen().done);
+  s1.value = 2;
+  assert.strictEqual(joined.value,5);
+  s1.freeze();
+  s1.value = 1;
+  assert(!joined.frozen().done);
+  assert.strictEqual(joined.value,5);
+  s2.freeze();
+  assert(joined.frozen().done);
+  assert.strictEqual(joined.value,5);
+});
