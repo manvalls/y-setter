@@ -311,7 +311,11 @@ Getter.prototype[define]({
   isA: function(v){ return transform([this,v],isA); },
   isAn: function(v){ return transform([this,v],isA); },
   isNotA: function(v){ return transform([this,v],isNotA); },
-  isNotAn: function(v){ return transform([this,v],isNotA); }
+  isNotAn: function(v){ return transform([this,v],isNotA); },
+
+  // ebjs label
+
+  ['3asKNsYzcdGduft']: 54
 
 });
 
