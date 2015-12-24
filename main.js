@@ -282,6 +282,19 @@ Getter.prototype[define]({
     return d;
   },
 
+  observe: function(ov,cb){
+    var args = [],
+        dArgs = [],
+        d = new Detacher(pauseIt,dArgs),
+        i;
+
+    for(i = 2;i < arguments.length;i++) args[i + 1] = arguments[i];
+    args[2] = d;
+
+    walk(observeLoop,[args,cb,ov,this,dArgs]);
+    return d;
+  },
+
   writable: false,
 
   // Simple transforms
@@ -474,7 +487,7 @@ function connect(v,ov,d,obj,key){
   obj[key] = v;
 }
 
-// -- watch and glance
+// -- watch and variants
 
 function pauseIt(w){
   w.pause();
@@ -528,6 +541,25 @@ function* glanceLoop(args,cb,that,dArgs){
 
     if(ov !== v) walk(cb,args,that);
     ov = that.value;
+  }
+
+}
+
+function* observeLoop(args,cb,ov,that,dArgs){
+  var v,yd;
+
+  dArgs[0] = this;
+
+  while(true){
+    v = that.value;
+    args[0] = v;
+    args[1] = ov;
+
+    yd = that.touched();
+    if(ov !== v) walk(cb,args,that);
+    ov = v;
+
+    yield yd;
   }
 
 }

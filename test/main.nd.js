@@ -254,6 +254,45 @@ t('\'watch\' works',function*(){
   yield cb;
 });
 
+t('\'observe\' works',function*(){
+  var setter = new Setter(5),
+      n = 0,
+      lv = 5,
+      extra;
+
+  setter.getter.observe(5,function(v,ov,d,x){
+    extra = x;
+    lv = v;
+    n++;
+  },'foo');
+
+  setter.value = 5;
+  assert.strictEqual(n,0);
+  assert.strictEqual(lv,5);
+
+  setter.value = 6;
+  assert.strictEqual(n,1);
+  assert.strictEqual(lv,6);
+  assert.strictEqual(extra,'foo');
+
+  setter = new Setter(6);
+  n = 0;
+  lv = 5;
+
+  setter.getter.observe(5,function(v,ov){
+    lv = v;
+    n++;
+  });
+
+  setter.value = 5;
+  assert.strictEqual(n,2);
+  assert.strictEqual(lv,5);
+
+  setter.value = 6;
+  assert.strictEqual(n,3);
+  assert.strictEqual(lv,6);
+});
+
 t('watch vs glance',function*(){
   var setter = new Setter(0),
       getter = setter.getter,
@@ -609,7 +648,7 @@ t('"freeze" and "frozen"',function(){
   h = new Hybrid();
   h.value = 'foo';
   h.freeze();
-  
+
   h.value = 'bar';
   assert.strictEqual(h.value,'foo');
   assert(h.frozen().done);
