@@ -37,7 +37,6 @@ wait = require('y-timers/wait');
 
 function Setter(value){
   this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
-  this[frozen] = new Resolver();
   this.value = value;
 };
 
@@ -52,13 +51,14 @@ Setter.prototype[define](bag = {
   set value(v){
     var ov;
 
-    if(this[frozen].yielded.done) return;
+    if(this[frozen] && this[frozen].yielded.done) return;
     ov = this[value];
     this[value] = v;
     if(ov !== v) this.touch();
   },
 
   freeze: function(){
+    this[frozen] = this[frozen] || new Resolver();
     this[frozen].accept();
   },
 
@@ -98,6 +98,7 @@ function getSY(setter){
 }
 
 function getSF(setter){
+  setter[frozen] = setter[frozen] || new Resolver();
   return setter[frozen].yielded;
 }
 
@@ -550,7 +551,6 @@ function Hybrid(value){
   ];
 
   this[getter] = this;
-  this[frozen] = new Resolver();
   this.value = value;
 }
 

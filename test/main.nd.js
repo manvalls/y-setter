@@ -606,7 +606,10 @@ t('"freeze" and "frozen"',function(){
   assert.strictEqual(h.value,'foo');
   assert(!h.frozen().done);
 
+  h = new Hybrid();
+  h.value = 'foo';
   h.freeze();
+  
   h.value = 'bar';
   assert.strictEqual(h.value,'foo');
   assert(h.frozen().done);
