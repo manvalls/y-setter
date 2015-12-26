@@ -679,3 +679,24 @@ t('"freeze" and "frozen"',function(){
   assert(joined.frozen().done);
   assert.strictEqual(joined.value,5);
 });
+
+t('Delegation',function*(){
+  var ds = new Setter(0),
+      ss = new Setter(1),
+      setter = new Setter(ds,ss.getter),
+      yd;
+
+  assert.strictEqual(setter.value,1);
+  ss.value = 2;
+  assert.strictEqual(setter.value,2);
+  setter.value = 5;
+  assert.strictEqual(ds.value,5);
+
+  yd = ds.getter.touched();
+  setter.touch();
+  yield yd;
+
+  setter.freeze();
+  yield ds.getter.frozen();
+  
+});

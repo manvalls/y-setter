@@ -5,6 +5,7 @@ var getY = Symbol(),
     value = Symbol(),
     frozen = Symbol(),
     getter = Symbol(),
+    setter = Symbol(),
     resolver = Symbol(),
 
     isSetter = 'o5CqYkOh5ezPpwT',
@@ -35,9 +36,16 @@ wait = require('y-timers/wait');
 
 // Setter
 
-function Setter(value){
-  this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
-  this.value = value;
+function Setter(st,gt){
+
+  if(arguments.length == 2){
+    this[getter] = gt;
+    this[setter] = st;
+  }else{
+    this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
+    this.value = arguments[0];
+  }
+
 };
 
 Setter.prototype[define](bag = {
@@ -45,12 +53,14 @@ Setter.prototype[define](bag = {
   [isSetter]: true,
 
   get value(){
+    if(this[setter]) return this[getter].value;
     return this[value];
   },
 
   set value(v){
     var ov;
 
+    if(this[setter]) return this[setter].value = v;
     if(this[frozen] && this[frozen].yielded.done) return;
     ov = this[value];
     this[value] = v;
@@ -58,13 +68,16 @@ Setter.prototype[define](bag = {
   },
 
   freeze: function(){
+    if(this[setter]) return this[setter].freeze();
     this[frozen] = this[frozen] || new Resolver();
     this[frozen].accept();
   },
 
   touch: function(){
-    var r = this[resolver];
+    var r;
 
+    if(this[setter]) return this[setter].touch();
+    r = this[resolver];
     if(!r) return;
     delete this[resolver];
     r.accept();
