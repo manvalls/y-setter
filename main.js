@@ -95,7 +95,11 @@ Setter.prototype[define](bag = {
     return this.value;
   },
 
-  writable: true
+  writable: true,
+
+  // ebjs label
+
+  ['3asKNsYzcdGduft']: 55
 
 });
 
