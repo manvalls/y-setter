@@ -252,6 +252,7 @@ Getter.prototype[define]({
 
   connect: function(obj,key){
     if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
+    if(Setter.is(obj)) this.frozen().listen(obj.freeze,[],obj);
     return this.watch(connect,obj,key);
   },
 

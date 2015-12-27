@@ -56,7 +56,7 @@ t('\'touched\' works',function(){
 });
 
 t('\'connect\' works',function(){
-  var o1 = {},
+  var o1 = new Setter(),
       o2 = {textContent: null},
       d;
 
@@ -698,5 +698,5 @@ t('Delegation',function*(){
 
   setter.freeze();
   yield ds.getter.frozen();
-  
+
 });
