@@ -610,5 +610,6 @@ function Hybrid(value){
 
 Hybrid.prototype = Object.create(Getter.prototype);
 
+Hybrid.prototype[define]('3asKNsYzcdGduft',56);
 Hybrid.prototype[define](bag);
 Hybrid.prototype[define]('constructor',Hybrid);
