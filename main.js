@@ -256,22 +256,12 @@ Getter.prototype[define]({
     return this.watch(connect,obj,key);
   },
 
-  to: function(){
+  to: function(fn){
     var getters = [this],
-        i,trn,thisArg;
+        i;
 
-    for(i = 0;i < arguments.length;i++){
-
-      if(typeof arguments[i] == 'function'){
-        trn = arguments[i];
-        thisArg = arguments[i + 1];
-        break;
-      }
-
-      getters.push(arguments[i]);
-    }
-
-    return transform(getters,trn,thisArg);
+    for(i = 1;i < arguments.length;i++) getters.push(arguments[i]);
+    return transform(getters,fn,this);
   },
 
   watch: function(cb){

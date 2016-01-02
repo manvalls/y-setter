@@ -100,14 +100,11 @@ t('\'connect\' works',function(){
 t('\'to\' works',function(){
 
   t('Single getter',function(){
-    var obj = {},
-        dest = getter.to(function(n){ return that = this,Math.floor(n + 1); },obj),
-        that;
+    var dest = getter.to(function(n){ return Math.floor(n + 1); });
 
     t('Value propagates',function(){
       setter.value = 0;
       assert.strictEqual(dest.value,1);
-      assert.strictEqual(that,obj);
     });
 
     t('\'touched\' works',function*(){
@@ -148,7 +145,7 @@ t('\'to\' works',function(){
   t('Multiple hybrids/non-getters',function(){
     var h1 = new Setter.Hybrid(),
         h2 = new Setter.Hybrid(),
-        dest = getter.to(h1,h2,0,function(v,v1,v2,s){ return Math.floor(v + v1 + v2 + s); });
+        dest = getter.to(function(v,v1,v2,s){ return Math.floor(v + v1 + v2 + s); },h1,h2,0);
 
     t('Value propagates',function(){
       setter.value = 0;
