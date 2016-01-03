@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "detacher": "^1.4.3",
-    "u-proto": "^5.4.3",
+    "u-proto": "^5.4.4",
     "y-resolver": "^9.0.0",
     "y-timers": "^1.1.1",
     "y-walk": "^10.0.2"
