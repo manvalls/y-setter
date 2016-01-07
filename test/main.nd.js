@@ -382,7 +382,7 @@ t('valueOf',function(){
 });
 
 t('concat',function(){
-  var h1 = new Hybrid(1),
+  var h1 = new Hybrid(new Setter(1)),
       h2 = new Hybrid(3),
       c = Getter.concat(h1,2,h2);
 

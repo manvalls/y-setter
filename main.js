@@ -575,27 +575,26 @@ function* observeLoop(args,cb,ov,that,dArgs){
 // HybridGetter
 
 function Hybrid(value){
+  var s;
+
+  if(value && Setter.is(value)) s = value;
+  else s = new Setter(value);
+
+  this[setter] = s;
+  this[getter] = s.getter;
 
   this[getY] = [
-    getSY,
-    [this],
-    this
-  ];
-
-  this[getV] = [
-    getSV,
-    [this],
+    getHY,
+    [s.getter],
     this
   ];
 
   this[getF] = [
-    getSF,
-    [this],
+    getHF,
+    [s.getter],
     this
   ];
 
-  this[getter] = this;
-  this.value = value;
 }
 
 Hybrid.prototype = Object.create(Getter.prototype);
@@ -603,3 +602,13 @@ Hybrid.prototype = Object.create(Getter.prototype);
 Hybrid.prototype[define]('3asKNsYzcdGduft',56);
 Hybrid.prototype[define](bag);
 Hybrid.prototype[define]('constructor',Hybrid);
+
+// - utils
+
+function getHY(getter){
+  return getter.touched();
+}
+
+function getHF(getter){
+  return getter.frozen();
+}
