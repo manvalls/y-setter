@@ -5,6 +5,8 @@ var t = require('u-test'),
     wait = require('y-timers/wait'),
     walk = require('y-walk'),
     Setter = require('../main.js'),
+    o2h = require('../o2h.js'),
+    h2o = require('../h2o.js'),
     Getter = Setter.Getter,
     Hybrid = Setter.Hybrid,
 
@@ -696,4 +698,22 @@ t('Delegation',function*(){
   setter.freeze();
   yield ds.getter.frozen();
 
+});
+
+t('o2h & h2o',function(){
+  var obj = o2h({
+    foo: 'bar',
+    obj: {
+      answer: 42
+    }
+  });
+
+  assert.strictEqual(obj.foo.constructor,Setter.Hybrid);
+  assert.strictEqual(obj.foo.value,'bar');
+  assert.strictEqual(obj.obj.answer.constructor,Setter.Hybrid);
+  assert.strictEqual(obj.obj.answer.value,42);
+
+  obj = h2o(obj);
+  assert.strictEqual(obj.foo,'bar');
+  assert.strictEqual(obj.obj.answer,42);
 });
