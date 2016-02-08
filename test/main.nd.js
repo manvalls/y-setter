@@ -341,6 +341,24 @@ t('watch vs glance',function*(){
 
 });
 
+t('\'throttle\' works',function*(){
+  var setter = new Setter(),
+      getter = setter.getter.throttle(0),
+      n,value;
+
+  getter.watch(v => (n++,value = v));
+  getter.watch(v => (n++,value = v));
+  n = 0;
+
+  setter.value = 1;
+  setter.value = 2;
+  setter.value = 3;
+
+  yield wait(10);
+  assert.strictEqual(n,2);
+  assert.strictEqual(value,3);
+});
+
 t('\'debounce\' works',function*(){
   var setter = new Setter(),
       getter = setter.getter.debounce(0),

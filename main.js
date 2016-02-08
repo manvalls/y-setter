@@ -241,6 +241,10 @@ Getter.prototype[define]({
     return transform(getters,callIt);
   },
 
+  throttle: function(timeout){
+    return new Getter(this[getV][0],this[getV][1],this[getV][2],getThr,[timeout,this]);
+  },
+
   debounce: function(timeout){
     return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
   },
@@ -465,9 +469,9 @@ function getProp(){
   return obj;
 }
 
-// -- debounce
+// -- throttle
 
-function getDeb(timeout,that){
+function getThr(timeout,that){
   var res;
 
   if(!this[resolver]){
@@ -479,13 +483,41 @@ function getDeb(timeout,that){
 }
 
 function delayer(that,timeout){
-  wait(timeout).listen(debListener,[that]);
+  wait(timeout).listen(thrListener,[that]);
 }
 
-function debListener(that){
+function thrListener(that){
   var res = that[resolver];
 
   delete that[resolver];
+  res.accept();
+}
+
+// -- debounce
+
+function getDeb(timeout,that){
+  var res;
+
+  if(!this[resolver]){
+    this[resolver] = res = new Resolver();
+    walk(debounce,[that,timeout],this);
+  }else res = this[resolver];
+
+  return res.yielded;
+}
+
+function* debounce(that,timeout){
+  var result = {},
+      res;
+
+  yield that.touched();
+  while(!('timeout' in result)) result = yield {
+    timeout: wait(timeout),
+    touched: that.touched()
+  };
+
+  res = this[resolver];
+  delete this[resolver];
   res.accept();
 }
 
