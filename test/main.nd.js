@@ -404,7 +404,7 @@ t('valueOf',function(){
 t('concat',function(){
   var h1 = new Hybrid(new Setter(1)),
       h2 = new Hybrid(3),
-      c = Getter.concat(h1,2,h2);
+      c = require('../concat')(h1,2,h2);
 
   assert.strictEqual(c.value,'123');
   h1.value = '0';

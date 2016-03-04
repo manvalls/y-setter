@@ -23,7 +23,6 @@ Setter.is = isSetterFn;
 
 Getter.is = isGetterFn;
 Getter.transform = transform;
-Getter.concat = concat;
 
 /*/ imports /*/
 
@@ -423,20 +422,6 @@ function or(v1,v2){ return v1 || v2; }
 
 function isA(v1,v2){ return v1 instanceof v2; }
 function isNotA(v1,v2){ return !(v1 instanceof v2); }
-
-// -- concat
-
-function concat(){
-  return transform(arguments,concatTf);
-}
-
-function concatTf(){
-  var result = '',
-      i;
-
-  for(i = 0;i < arguments.length;i++) result += arguments[i];
-  return result;
-}
 
 // -- run and call
 
