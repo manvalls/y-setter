@@ -450,7 +450,11 @@ function getProp(){
   var obj = arguments[0],
       i;
 
-  for(i = 1;i < arguments.length;i++) obj = obj[arguments[i]];
+  for(i = 1;i < arguments.length;i++){
+    if(obj == null) obj = {};
+    obj = obj[arguments[i]];
+  }
+
   return obj;
 }
 

@@ -230,6 +230,11 @@ t('\'get\' works',function(){
   setter.value = {foo: {foo: 'foo'}};
   assert.strictEqual(yd.done,true);
   assert.strictEqual(foo.value,'foo');
+
+  setter.value = {foo: 5};
+  assert.strictEqual(foo.value,undefined);
+  setter.value = {bar: 5};
+  assert.strictEqual(foo.value,undefined);
 });
 
 t('\'watch\' works',function*(){
