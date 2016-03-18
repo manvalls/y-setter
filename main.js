@@ -351,6 +351,7 @@ function isGetterFn(obj){
 
 function* getYielded(getter){
   while(!getter.value) yield getter.touched();
+  return getter.value;
 }
 
 function through(v){ return v; }
