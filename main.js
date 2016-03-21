@@ -72,6 +72,16 @@ Setter.prototype[define](bag = {
     this[frozen].accept();
   },
 
+  update: function(){
+    var r;
+
+    if(this[setter]) return this[setter].update();
+    r = this[resolver];
+    if(!r) return;
+    delete this[resolver];
+    r.accept(true);
+  },
+
   touch: function(){
     var r;
 
@@ -524,7 +534,7 @@ function pauseIt(w){
 }
 
 function* watchLoop(args,cb,that,dArgs){
-  var ov,v,yd;
+  var ov,v,yd,update;
 
   dArgs[0] = this;
 
@@ -537,21 +547,21 @@ function* watchLoop(args,cb,that,dArgs){
   ov = v;
 
   while(true){
-    yield yd;
+    update = yield yd;
 
     v = that.value;
     args[0] = v;
     args[1] = ov;
 
     yd = that.touched();
-    if(ov !== v) walk(cb,args,that);
+    if(update || ov !== v) walk(cb,args,that);
     ov = v;
   }
 
 }
 
 function* glanceLoop(args,cb,that,dArgs){
-  var ov,v;
+  var ov,v,update;
 
   dArgs[0] = this;
 
@@ -563,13 +573,13 @@ function* glanceLoop(args,cb,that,dArgs){
   ov = that.value;
 
   while(true){
-    yield that.touched();
+    update = yield that.touched();
 
     v = that.value;
     args[0] = v;
     args[1] = ov;
 
-    if(ov !== v) walk(cb,args,that);
+    if(update || ov !== v) walk(cb,args,that);
     ov = that.value;
   }
 

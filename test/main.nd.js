@@ -718,6 +718,10 @@ t('Delegation',function*(){
   setter.touch();
   yield yd;
 
+  yd = ds.getter.touched();
+  setter.update();
+  assert(yield yd);
+
   setter.freeze();
   yield ds.getter.frozen();
 
@@ -739,4 +743,15 @@ t('o2h & h2o',function(){
   obj = h2o(obj);
   assert.strictEqual(obj.foo,'bar');
   assert.strictEqual(obj.obj.answer,42);
+});
+
+t('setter.update()',function(){
+  var setter = new Setter(),
+      n = 0;
+
+  setter.update();
+  setter.getter.watch(() => n++);
+  assert.strictEqual(n,1);
+  setter.update();
+  assert.strictEqual(n,2);
 });
