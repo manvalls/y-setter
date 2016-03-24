@@ -89,7 +89,7 @@ Setter.prototype[define](bag = {
     r = this[resolver];
     if(!r) return;
     delete this[resolver];
-    r.accept();
+    r.accept(false);
   },
 
   set: function(v){
@@ -476,21 +476,32 @@ function getThr(timeout,that){
 
   if(!this[resolver]){
     this[resolver] = res = new Resolver();
-    that.touched().listen(delayer,[this,timeout]);
+    walk(throttle,[that,timeout],this);
   }else res = this[resolver];
 
   return res.yielded;
 }
 
-function delayer(that,timeout){
-  wait(timeout).listen(thrListener,[that]);
-}
+function* throttle(that,timeout){
+  var result,res,force,t;
 
-function thrListener(that){
-  var res = that[resolver];
+  force = yield that.touched();
+  t = wait(timeout);
 
-  delete that[resolver];
-  res.accept();
+  do{
+
+    result = yield {
+      timeout: t,
+      touched: that.touched()
+    };
+
+    force = force || result.touched;
+
+  }while(!('timeout' in result));
+
+  res = this[resolver];
+  delete this[resolver];
+  res.accept(force);
 }
 
 // -- debounce
@@ -507,18 +518,24 @@ function getDeb(timeout,that){
 }
 
 function* debounce(that,timeout){
-  var result = {},
-      res;
+  var result,res,force;
 
-  yield that.touched();
-  while(!('timeout' in result)) result = yield {
-    timeout: wait(timeout),
-    touched: that.touched()
-  };
+  force = yield that.touched();
+
+  do{
+
+    result = yield {
+      timeout: wait(timeout),
+      touched: that.touched()
+    };
+
+    force = force || result.touched;
+
+  }while(!('timeout' in result));
 
   res = this[resolver];
   delete this[resolver];
-  res.accept();
+  res.accept(force);
 }
 
 // -- connect
