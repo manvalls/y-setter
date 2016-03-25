@@ -258,6 +258,10 @@ Getter.prototype[define]({
     return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
   },
 
+  precision: function(prec){
+    return new Getter(this[getV][0],this[getV][1],this[getV][2],getPrec,[prec,this]);
+  },
+
   touched: function(){
     var gy = this[getY];
     return gy[0].apply(gy[2],gy[1]);
@@ -544,6 +548,31 @@ function* debounce(that,timeout){
     force = force || result.touched;
 
   }while(!('timeout' in result));
+
+  res = this[resolver];
+  delete this[resolver];
+  res.accept(force);
+}
+
+// -- precision
+
+function getPrec(prec,that){
+  var res;
+
+  if(!this[resolver]){
+    this[resolver] = res = new Resolver();
+    walk(precision,[that,prec],this);
+  }else res = this[resolver];
+
+  return res.yielded;
+}
+
+function* precision(that,prec){
+  var result,res,force,ov;
+
+  ov = that.value;
+  force = yield that.touched();
+  while(!force && Math.abs(ov - that.value) < prec) force = yield that.touched();
 
   res = this[resolver];
   delete this[resolver];

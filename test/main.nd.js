@@ -382,6 +382,22 @@ t('\'debounce\' works',function*(){
   assert.strictEqual(value,3);
 });
 
+t('\'precision\' works',function*(){
+  var setter = new Setter(),
+      getter = setter.getter.precision(2),
+      n,value;
+
+  getter.watch(v => (n++,value = v));
+  n = 0;
+
+  setter.value = 1;
+  setter.value = 2;
+  setter.value = 3;
+
+  assert.strictEqual(n,2);
+  assert.strictEqual(value,3);
+});
+
 t('Getter constructor',function(){
   var yd = (new Resolver()).yielded,
       n = 0,
