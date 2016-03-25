@@ -627,6 +627,14 @@ t('Simple transformers',function(){
     assert.strictEqual(h.mn(3).value,3);
   });
 
+  t('math',function(){
+    var h = new Hybrid(4);
+
+    assert.strictEqual(h.math('sqrt').value,2);
+    assert.strictEqual(h.math('max',500).value,500);
+    assert.strictEqual(h.math('min',500).value,4);
+  });
+
 });
 
 t('One-argument constructor',function(){

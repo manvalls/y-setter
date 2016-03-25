@@ -347,6 +347,8 @@ Getter.prototype[define]({
   isNotA: function(v){ return transform([this,v],isNotA); },
   isNotAn: function(v){ return transform([this,v],isNotA); },
 
+  math: function(){ return transform([this,...arguments],math); },
+
   // ebjs label
 
   ['3asKNsYzcdGduft']: 54
@@ -433,6 +435,16 @@ function or(v1,v2){ return v1 || v2; }
 
 function isA(v1,v2){ return v1 instanceof v2; }
 function isNotA(v1,v2){ return !(v1 instanceof v2); }
+
+function math(){
+  var args = [],
+      method,i;
+
+  args.push(arguments[0]);
+  method = arguments[1];
+  for(i = 2;i < arguments.length;i++) args.push(arguments[i]);
+  return Math[method](...args);
+}
 
 // -- run and call
 
