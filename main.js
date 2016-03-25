@@ -268,9 +268,14 @@ Getter.prototype[define]({
   },
 
   connect: function(obj,key){
+    var d;
+
     if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
     if(Setter.is(obj)) this.frozen().listen(obj.freeze,[],obj);
-    return this.watch(connect,obj,key);
+
+    d = this.watch(connect,obj,key);
+    if(Setter.is(obj)) obj.getter.frozen().listen(d.detach,[],d);
+    return d;
   },
 
   to: function(fn){
