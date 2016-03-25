@@ -383,8 +383,8 @@ t('\'debounce\' works',function*(){
 });
 
 t('\'precision\' works',function*(){
-  var setter = new Setter(),
-      getter = setter.getter.precision(2),
+  var setter = new Hybrid(),
+      getter = setter.precision(2),
       n,value;
 
   getter.watch(v => (n++,value = v));

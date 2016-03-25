@@ -673,6 +673,12 @@ function Hybrid(value){
   this[setter] = s;
   this[getter] = s.getter;
 
+  this[getV] = [
+    getHV,
+    [s.getter],
+    this
+  ];
+
   this[getY] = [
     getHY,
     [s.getter],
@@ -694,6 +700,10 @@ Hybrid.prototype[define](bag);
 Hybrid.prototype[define]('constructor',Hybrid);
 
 // - utils
+
+function getHV(getter){
+  return getter.value;
+}
 
 function getHY(getter){
   return getter.touched();
