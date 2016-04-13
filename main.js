@@ -587,7 +587,7 @@ function* precision(that,prec){
 // -- connect
 
 function connect(v,ov,d,obj,key){
-  if(obj[key] != v) obj[key] = v;
+  if(obj[key] !== v) obj[key] = v;
 }
 
 // -- watch and variants
