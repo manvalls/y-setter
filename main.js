@@ -23,6 +23,9 @@ Setter.is = isSetterFn;
 
 Getter.is = isGetterFn;
 Getter.transform = transform;
+Getter.watch = watchAll;
+Getter.observe = observeAll;
+Getter.glance = glanceAll;
 
 /*/ imports /*/
 
@@ -286,43 +289,20 @@ Getter.prototype[define]({
     return transform(getters,fn,this);
   },
 
-  watch: function(cb){
-    var args = [],
-        dArgs = [],
-        d = new Detacher(pauseIt,dArgs),
-        i;
-
-    for(i = 1;i < arguments.length;i++) args[i + 2] = arguments[i];
-    args[2] = d;
-
-    walk(watchLoop,[args,cb,this,dArgs]);
-    return d;
+  watch: function(){
+    return watchAll([this],...arguments);
   },
 
-  glance: function(cb){
-    var args = [],
-        dArgs = [],
-        d = new Detacher(pauseIt,dArgs),
-        i;
-
-    for(i = 1;i < arguments.length;i++) args[i + 2] = arguments[i];
-    args[2] = d;
-
-    walk(glanceLoop,[args,cb,this,dArgs]);
-    return d;
+  glance: function(){
+    return glanceAll([this],...arguments);
   },
 
-  observe: function(ov,cb){
+  observe: function(ov){
     var args = [],
-        dArgs = [],
-        d = new Detacher(pauseIt,dArgs),
         i;
 
-    for(i = 2;i < arguments.length;i++) args[i + 1] = arguments[i];
-    args[2] = d;
-
-    walk(observeLoop,[args,cb,ov,this,dArgs]);
-    return d;
+    for(i = 1;i < arguments.length;i++) args.push(arguments[i]);
+    return observeAll([this],[ov],...args);
   },
 
   writable: false,
@@ -377,6 +357,131 @@ function* getYielded(getter){
 
 function through(v){ return v; }
 function retYd(){ return (new Resolver()).yielded; }
+
+// -- watchAll and glanceAll
+
+function pauseIt(w){
+  w.pause();
+}
+
+function watchAll(getters,cb){
+  var args = [],
+      dArgs = [],
+      d = new Detacher(pauseIt,dArgs),
+      i;
+
+  for(i = 2;i < arguments.length;i++) args.push(arguments[i]);
+  walk(watchAllLoop,[args,d,cb,getters,dArgs]);
+  return d;
+}
+
+function* watchAllLoop(args,d,cb,getters,dArgs){
+  var ov,v,yd,update,getter,i;
+
+  dArgs[0] = this;
+
+  v = [];
+  ov = [];
+
+  for(getter of getters){
+    v.push(getter.value);
+    ov.push(undefined);
+  }
+
+  yd = getTY(getters);
+  walk(cb,[...v,...ov,d,...args],getters[0]);
+  ov = v;
+
+  while(true){
+    update = yield yd;
+
+    v = [];
+    for(getter of getters) v.push(getter.value);
+
+    yd = getTY(getters);
+    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+    ov = v;
+  }
+
+}
+
+function glanceAll(getters,cb){
+  var args = [],
+      dArgs = [],
+      d = new Detacher(pauseIt,dArgs),
+      i;
+
+  for(i = 2;i < arguments.length;i++) args.push(arguments[i]);
+  walk(glanceAllLoop,[args,d,cb,getters,dArgs]);
+  return d;
+}
+
+function* glanceAllLoop(args,d,cb,getters,dArgs){
+  var ov,v,update,getter,i;
+
+  dArgs[0] = this;
+
+  v = [];
+  ov = [];
+
+  for(getter of getters){
+    v.push(getter.value);
+    ov.push(undefined);
+  }
+
+  walk(cb,[...v,...ov,d,...args],getters[0]);
+
+  ov = [];
+  for(getter of getters) ov.push(getter.value);
+
+  while(true){
+    update = yield getTY(getters);
+
+    v = [];
+    for(getter of getters) v.push(getter.value);
+    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+
+    ov = [];
+    for(getter of getters) ov.push(getter.value);
+  }
+
+}
+
+function observeAll(getters,ov,cb){
+  var args = [],
+      dArgs = [],
+      d = new Detacher(pauseIt,dArgs),
+      i;
+
+  for(i = 3;i < arguments.length;i++) args.push(arguments[i])
+  walk(observeAllLoop,[args,d,cb,ov,getters,dArgs]);
+  return d;
+}
+
+function* observeAllLoop(args,d,cb,ov,getters,dArgs){
+  var v,yd,update;
+
+  dArgs[0] = this;
+  while(true){
+    update = yield yd;
+
+    v = [];
+    for(getter of getters) v.push(getter.value);
+
+    yd = getTY(getters);
+    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+    ov = v;
+  }
+
+}
+
+function sameArray(a1,a2){
+  var i;
+
+  if(a1.length != a2.length) return false;
+  for(i = 0;i < a1.length;i++) if(a1[i] !== a2[i]) return false;
+  return true;
+}
 
 // -- transform
 
@@ -588,83 +693,6 @@ function* precision(that,prec){
 
 function connect(v,ov,d,obj,key){
   if(obj[key] !== v) obj[key] = v;
-}
-
-// -- watch and variants
-
-function pauseIt(w){
-  w.pause();
-}
-
-function* watchLoop(args,cb,that,dArgs){
-  var ov,v,yd,update;
-
-  dArgs[0] = this;
-
-  v = that.value;
-  args[0] = v;
-  args[1] = ov;
-
-  yd = that.touched();
-  walk(cb,args,that);
-  ov = v;
-
-  while(true){
-    update = yield yd;
-
-    v = that.value;
-    args[0] = v;
-    args[1] = ov;
-
-    yd = that.touched();
-    if(update || ov !== v) walk(cb,args,that);
-    ov = v;
-  }
-
-}
-
-function* glanceLoop(args,cb,that,dArgs){
-  var ov,v,update;
-
-  dArgs[0] = this;
-
-  v = that.value;
-  args[0] = v;
-  args[1] = ov;
-
-  walk(cb,args,that);
-  ov = that.value;
-
-  while(true){
-    update = yield that.touched();
-
-    v = that.value;
-    args[0] = v;
-    args[1] = ov;
-
-    if(update || ov !== v) walk(cb,args,that);
-    ov = that.value;
-  }
-
-}
-
-function* observeLoop(args,cb,ov,that,dArgs){
-  var v,yd;
-
-  dArgs[0] = this;
-
-  while(true){
-    v = that.value;
-    args[0] = v;
-    args[1] = ov;
-
-    yd = that.touched();
-    if(ov !== v) walk(cb,args,that);
-    ov = v;
-
-    yield yd;
-  }
-
 }
 
 // HybridGetter
