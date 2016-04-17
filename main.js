@@ -376,7 +376,7 @@ function watchAll(getters,cb){
 }
 
 function* watchAllLoop(args,d,cb,getters,dArgs){
-  var ov,v,yd,update,getter,i;
+  var ov,v,yd,update,getter;
 
   dArgs[0] = this;
 
@@ -417,7 +417,7 @@ function glanceAll(getters,cb){
 }
 
 function* glanceAllLoop(args,d,cb,getters,dArgs){
-  var ov,v,update,getter,i;
+  var ov,v,update,getter;
 
   dArgs[0] = this;
 
@@ -459,7 +459,7 @@ function observeAll(getters,ov,cb){
 }
 
 function* observeAllLoop(args,d,cb,ov,getters,dArgs){
-  var v,yd,update;
+  var v,yd,getter,update;
 
   dArgs[0] = this;
   while(true){
