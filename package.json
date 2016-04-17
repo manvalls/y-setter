@@ -1,6 +1,6 @@
 {
   "name": "y-setter",
-  "version": "6.5.0",
+  "version": "6.5.1",
   "description": "Properties on which you can listen for changes",
   "main": "main.js",
   "dependencies": {
