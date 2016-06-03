@@ -692,13 +692,7 @@ function* precision(that,prec){
 // -- connect
 
 function connect(v,ov,d,obj,key){
-  var desc;
-
-  if(obj[key] !== v){
-    desc = Object.getOwnPropertyDescriptor(obj,key);
-    if(!desc || desc.writable !== false) obj[key] = v;
-  }
-
+  if(obj[key] !== v) try{ obj[key] = v; }catch(e){}
 }
 
 // HybridGetter
