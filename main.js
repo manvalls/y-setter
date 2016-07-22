@@ -495,6 +495,7 @@ function getTY(getters){
 
   for(i = 0;i < getters.length;i++){
     if(Getter.is(getters[i])) yds.push(getters[i].touched());
+    else if(Yielded.is(getters[i]) && !getters[i].done) yds.push(getters[i]);
   }
 
   return Resolver.race(yds);
@@ -505,7 +506,7 @@ function getTV(getters,trn,thisArg){
       i;
 
   for(i = 0;i < getters.length;i++){
-    if(Getter.is(getters[i])) values[i] = getters[i].value;
+    if(Getter.is(getters[i]) || Yielded.is(getters[i])) values[i] = getters[i].value;
     else values[i] = getters[i];
   }
 

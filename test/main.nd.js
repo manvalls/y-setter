@@ -147,7 +147,8 @@ t('\'to\' works',function(){
   t('Multiple hybrids/non-getters',function(){
     var h1 = new Setter.Hybrid(),
         h2 = new Setter.Hybrid(),
-        dest = getter.to(function(v,v1,v2,s){ return Math.floor(v + v1 + v2 + s); },h1,h2,0);
+        res = new Resolver(),
+        dest = getter.to((v,v1,v2,s,yd) => Math.floor(v + v1 + v2 + s + (yd || 0)),h1,h2,0,res.yielded);
 
     t('Value propagates',function(){
       setter.value = 0;
@@ -180,6 +181,12 @@ t('\'to\' works',function(){
       h2.value = 1;
       assert(yd.done);
 
+      yd = dest.touched();
+      assert(!yd.done);
+      res.accept(1);
+      assert(yd.done);
+      assert.strictEqual(dest.value,Math.floor(getter.value + h1.value + h2.value + 1));
+
     });
 
     t('Watch works',function*(){
@@ -189,7 +196,7 @@ t('\'to\' works',function(){
       d = dest.watch(cb = Cb(function(v){
         assert(ok);
         assert.strictEqual(v,dest.value);
-        assert.strictEqual(v,Math.floor(getter.value + h1.value + h2.value));
+        assert.strictEqual(v,Math.floor(getter.value + h1.value + h2.value + (res.yielded.value || 0)));
         ok = false;
       }));
 
