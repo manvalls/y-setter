@@ -486,7 +486,7 @@ function sameArray(a1,a2){
 // -- transform
 
 function transform(getters,func,thisArg){
-  return new Getter(getTV,[getters,func,thisArg,{}],getTY,[getters],getTF,[getters]);
+  return new Getter(getTV,[getters,func,thisArg],getTY,[getters],getTF,[getters]);
 }
 
 function getTY(getters){
@@ -501,25 +501,12 @@ function getTY(getters){
   return Resolver.race(yds);
 }
 
-function getTV(getters,trn,thisArg,ctx){
+function getTV(getters,trn,thisArg){
   var values = [],
       i;
 
   for(i = 0;i < getters.length;i++){
-    if(Getter.is(getters[i])){
-
-      if(ctx[i] && !ctx[i].touched.done) values[i] = ctx[i].value;
-      else{
-
-        values[i] = getters[i].value;
-        ctx[i] = {
-          value: values[i],
-          touched: getters[i].touched()
-        };
-
-      }
-
-    }else if(Yielded.is(getters[i])) values[i] = getters[i].value;
+    if(Getter.is(getters[i]) || Yielded.is(getters[i])) values[i] = getters[i].value;
     else values[i] = getters[i];
   }
 
