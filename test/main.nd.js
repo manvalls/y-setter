@@ -690,9 +690,9 @@ t('Yielded getter',function(){
 
 });
 
-t('"freeze" and "frozen"',function(){
+t('"freeze" and "frozen"',function*(){
   var h = new Hybrid(),
-      g,s1,s2,joined;
+      g,s1,s2,joined,res,t;
 
   h.value = 'foo';
   assert.strictEqual(h.value,'foo');
@@ -731,6 +731,29 @@ t('"freeze" and "frozen"',function(){
   s2.freeze();
   assert(joined.frozen().done);
   assert.strictEqual(joined.value,5);
+
+  res = new Resolver();
+  h = new Hybrid(res.yielded);
+  h.value = 'foo';
+  res.accept();
+  t = h.touched();
+  h.value = 'bar';
+  yield h.frozen();
+
+  assert.strictEqual(t.done,false);
+  assert.strictEqual(h.value,'foo');
+
+  res = new Resolver();
+  h = new Hybrid(res.yielded);
+  h.value = 'foo';
+  h.freeze();
+  t = h.touched();
+  h.value = 'bar';
+  yield h.frozen();
+
+  assert.strictEqual(t.done,false);
+  assert.strictEqual(h.value,'foo');
+
 });
 
 t('Delegation',function*(){

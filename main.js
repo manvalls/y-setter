@@ -7,6 +7,7 @@ var getY = Symbol(),
     getter = Symbol(),
     setter = Symbol(),
     resolver = Symbol(),
+    parent = Symbol(),
 
     isSetter = 'o5CqYkOh5ezPpwT',
     isGetter = '3tPmTSBio57bVrt',
@@ -38,14 +39,19 @@ wait = require('y-timers/wait');
 
 // Setter
 
-function Setter(st,gt){
+function Setter(){
 
-  if(arguments.length == 2){
-    this[getter] = gt;
-    this[setter] = st;
+  if(Setter.is(arguments[0]) && Getter.is(arguments[1])){
+    this[setter] = arguments[0];
+    this[getter] = arguments[1];
   }else{
+
     this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
     this.value = arguments[0];
+
+    if(Yielded.is(arguments[0])) this[parent] = arguments[0];
+    else this.value = arguments[0];
+
   }
 
 };
@@ -63,7 +69,12 @@ Setter.prototype[define](bag = {
     var ov;
 
     if(this[setter]) return this[setter].value = v;
-    if(this[frozen] && this[frozen].yielded.done) return;
+
+    if(
+      (this[frozen] && this[frozen].yielded.done) ||
+      (this[parent] && this[parent].done)
+    ) return;
+
     ov = this[value];
     this[value] = v;
     if(ov !== v) this.touch();
@@ -122,12 +133,19 @@ function getSV(setter){
 }
 
 function getSY(setter){
+
+  if(
+    (setter[frozen] && setter[frozen].yielded.done) ||
+    (setter[parent] && setter[parent].done)
+  ) return new Yielded();
+
   if(!setter[resolver]) setter[resolver] = new Resolver();
   return setter[resolver].yielded;
 }
 
 function getSF(setter){
   setter[frozen] = setter[frozen] || new Resolver();
+  if(setter[parent]) return Resolver.race([setter[frozen].yielded,setter[parent]]);
   return setter[frozen].yielded;
 }
 
