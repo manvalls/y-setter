@@ -299,6 +299,16 @@ Getter.prototype[define]({
     return d;
   },
 
+  pipe: function(obj,key){
+    var d;
+
+    if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
+
+    d = this.watch(pipe,obj,key);
+    if(Setter.is(obj)) obj.getter.frozen().listen(d.detach,[],d);
+    return d;
+  },
+
   to: function(fn){
     var getters = [this],
         i;
@@ -712,6 +722,12 @@ function* precision(that,prec){
 
 function connect(v,ov,d,obj,key){
   if(obj[key] !== v) try{ obj[key] = v; }catch(e){}
+}
+
+// -- pipe
+
+function pipe(v,ov,d,obj,key){
+  if(v !== undefined && obj[key] !== v) try{ obj[key] = v; }catch(e){}
 }
 
 // HybridGetter

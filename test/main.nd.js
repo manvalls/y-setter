@@ -66,8 +66,8 @@ t('\'connect\' works',function(){
     d = getter.connect(o1);
     assert.strictEqual(o1.value,getter.value);
     setter.value = {};
-
     assert.strictEqual(o1.value,getter.value);
+
     d.detach();
     setter.value = {};
     assert.notEqual(o1.value,getter.value);
@@ -79,7 +79,6 @@ t('\'connect\' works',function(){
     setter.value = {};
     assert.strictEqual(o2.textContent,getter.value);
 
-    assert.strictEqual(o2.textContent,getter.value);
     d.detach();
     setter.value = {};
     assert.notEqual(o2.textContent,getter.value);
@@ -91,7 +90,61 @@ t('\'connect\' works',function(){
     setter.value = {};
     assert.strictEqual(o1.foo,getter.value);
 
+    d.detach();
+    setter.value = {};
+    assert.notEqual(o1.foo,getter.value);
+  });
+
+});
+
+t('\'pipe\' works',function(){
+  var o1 = new Setter(),
+      o2 = {textContent: null},
+      d;
+
+  t('Default property, object with no \'textContent\'',function(){
+    var obj;
+
+    d = getter.pipe(o1);
+    assert.strictEqual(o1.value,getter.value);
+
+    setter.value = obj = {};
+    assert.strictEqual(o1.value,getter.value);
+    setter.value = undefined;
+    assert.strictEqual(o1.value,obj);
+
+    d.detach();
+    setter.value = {};
+    assert.notEqual(o1.value,getter.value);
+  });
+
+  t('Default property, object with \'textContent\'',function(){
+    var obj;
+
+    d = getter.pipe(o2);
+    assert.strictEqual(o2.textContent,getter.value);
+
+    setter.value = obj = {};
+    assert.strictEqual(o2.textContent,getter.value);
+    setter.value = undefined;
+    assert.strictEqual(o2.textContent,obj);
+
+    d.detach();
+    setter.value = {};
+    assert.notEqual(o2.textContent,getter.value);
+  });
+
+  t('Custom property',function(){
+    var obj;
+
+    d = getter.pipe(o1,'foo');
     assert.strictEqual(o1.foo,getter.value);
+
+    setter.value = obj = {};
+    assert.strictEqual(o1.foo,getter.value);
+    setter.value = undefined;
+    assert.strictEqual(o1.foo,obj);
+
     d.detach();
     setter.value = {};
     assert.notEqual(o1.foo,getter.value);
