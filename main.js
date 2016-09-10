@@ -13,7 +13,7 @@ var getY = Symbol(),
     isGetter = '3tPmTSBio57bVrt',
 
     defaultSetter = {
-      set: (obj,key,value) => obj[key] = value
+      set: (obj,key,value) => obj[key] !== value ? obj[key] = value : value
     },
 
     Resolver,walk,Detacher,define,wait,
@@ -754,7 +754,7 @@ function connect(v,ov,d,obj,keys,setter){
   for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
   key = keys[i];
 
-  if(obj[key] !== v) try{ setter.set(obj,key,v); }catch(e){}
+  try{ setter.set(obj,key,v); }catch(e){}
 }
 
 // -- pipe
@@ -765,7 +765,7 @@ function pipe(v,ov,d,obj,keys,setter){
   for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
   key = keys[i];
 
-  if(v !== undefined && obj[key] !== v) try{ setter.set(obj,key,v); }catch(e){}
+  if(v !== undefined) try{ setter.set(obj,key,v); }catch(e){}
 }
 
 // HybridGetter
