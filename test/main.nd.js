@@ -60,7 +60,20 @@ t('\'touched\' works',function(){
 t('\'connect\' works',function(){
   var o1 = new Setter(),
       o2 = {textContent: null},
+      o3 = {foo: {bar: 'baz'}},
       d;
+
+  t('Multiple keys',function(){
+    d = getter.connect(o3,['foo','bar']);
+    assert.strictEqual(o3.foo.bar,getter.value);
+
+    setter.value = {};
+    assert.strictEqual(o3.foo.bar,getter.value);
+
+    d.detach();
+    setter.value = {};
+    assert.notEqual(o1.value,getter.value);
+  });
 
   t('Default property, object with no \'textContent\'',function(){
     d = getter.connect(o1);
@@ -100,7 +113,24 @@ t('\'connect\' works',function(){
 t('\'pipe\' works',function(){
   var o1 = new Setter(),
       o2 = {textContent: null},
+      o3 = {foo: {bar: 'baz'}},
       d;
+
+  t('Multiple keys',function(){
+    var obj;
+
+    d = getter.pipe(o3,['foo','bar']);
+    assert.strictEqual(o3.foo.bar,getter.value);
+
+    setter.value = obj = {};
+    assert.strictEqual(o3.foo.bar,getter.value);
+    setter.value = undefined;
+    assert.strictEqual(o3.foo.bar,obj);
+
+    d.detach();
+    setter.value = {};
+    assert.notEqual(o1.value,getter.value);
+  });
 
   t('Default property, object with no \'textContent\'',function(){
     var obj;

@@ -288,24 +288,30 @@ Getter.prototype[define]({
     return gy[0].apply(gy[2],gy[1]);
   },
 
-  connect: function(obj,key){
+  connect: function(obj,keys){
     var d;
 
-    if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
-    if(Setter.is(obj)) this.frozen().listen(obj.freeze,[],obj);
+    if(keys == null) keys = ['textContent' in obj ? 'textContent' : 'value'];
+    else if(typeof keys == 'string') keys = [keys];
 
-    d = this.watch(connect,obj,key);
-    if(Setter.is(obj)) obj.getter.frozen().listen(d.detach,[],d);
+    d = this.watch(connect,obj,keys);
+
+    if(Setter.is(obj) && keys.length == 1 && keys[0] == 'value'){
+      this.frozen().listen(obj.freeze,[],obj);
+      obj.getter.frozen().listen(d.detach,[],d);
+    }
+
     return d;
   },
 
-  pipe: function(obj,key){
+  pipe: function(obj,keys){
     var d;
 
-    if(key == null) key = 'textContent' in obj ? 'textContent' : 'value';
+    if(keys == null) keys = ['textContent' in obj ? 'textContent' : 'value'];
+    else if(typeof keys == 'string') keys = [keys];
 
-    d = this.watch(pipe,obj,key);
-    if(Setter.is(obj)) obj.getter.frozen().listen(d.detach,[],d);
+    d = this.watch(pipe,obj,keys);
+    if(Setter.is(obj) && keys.length == 1 && keys[0] == 'value') obj.getter.frozen().listen(d.detach,[],d);
     return d;
   },
 
@@ -720,13 +726,23 @@ function* precision(that,prec){
 
 // -- connect
 
-function connect(v,ov,d,obj,key){
+function connect(v,ov,d,obj,keys){
+  var i,key;
+
+  for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
+  key = keys[i];
+
   if(obj[key] !== v) try{ obj[key] = v; }catch(e){}
 }
 
 // -- pipe
 
-function pipe(v,ov,d,obj,key){
+function pipe(v,ov,d,obj,keys){
+  var i,key;
+
+  for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
+  key = keys[i];
+
   if(v !== undefined && obj[key] !== v) try{ obj[key] = v; }catch(e){}
 }
 
