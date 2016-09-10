@@ -243,7 +243,7 @@ Getter.prototype[define]({
 
   frozen: function(){
     var gf = this[getF];
-    return gf[0].apply(gf[2],gf[1]);
+    return gf[0].call(gf[2],...gf[1],...arguments);
   },
 
   valueOf: function(){
@@ -289,7 +289,7 @@ Getter.prototype[define]({
 
   touched: function(){
     var gy = this[getY];
-    return gy[0].apply(gy[2],gy[1]);
+    return gy[0].call(gy[2],...gy[1],...arguments);
   },
 
   connect: function(obj,keys,setter){
@@ -395,7 +395,15 @@ function isGetterFn(obj){
 }
 
 function* getYielded(getter){
-  while(!getter.value) yield getter.touched();
+  var v,ov;
+
+  v = getter.value;
+  while(!v){
+    yield getter.touched(v,ov);
+    ov = v;
+    v = getter.value;
+  }
+
   return getter.value;
 }
 
@@ -420,7 +428,8 @@ function watchAll(getters,cb){
 }
 
 function* watchAllLoop(args,d,cb,getters,dArgs){
-  var ov,v,yd,update,getter;
+  var wasTheSame = false,
+      ov,v,yd,update,getter;
 
   dArgs[0] = this;
 
@@ -432,7 +441,7 @@ function* watchAllLoop(args,d,cb,getters,dArgs){
     ov.push(undefined);
   }
 
-  yd = getTY(getters);
+  yd = getTY(getters,!wasTheSame);
   walk(cb,[...v,...ov,d,...args],getters[0]);
   ov = v;
 
@@ -442,8 +451,9 @@ function* watchAllLoop(args,d,cb,getters,dArgs){
     v = [];
     for(getter of getters) v.push(getter.value);
 
-    yd = getTY(getters);
-    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+    yd = getTY(getters,!wasTheSame);
+    wasTheSame = sameArray(v,ov);
+    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
     ov = v;
   }
 
@@ -461,7 +471,8 @@ function glanceAll(getters,cb){
 }
 
 function* glanceAllLoop(args,d,cb,getters,dArgs){
-  var ov,v,update,getter;
+  var wasTheSame = false,
+      ov,v,update,getter;
 
   dArgs[0] = this;
 
@@ -479,11 +490,12 @@ function* glanceAllLoop(args,d,cb,getters,dArgs){
   for(getter of getters) ov.push(getter.value);
 
   while(true){
-    update = yield getTY(getters);
+    update = yield getTY(getters,!wasTheSame);
 
     v = [];
     for(getter of getters) v.push(getter.value);
-    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+    wasTheSame = sameArray(v,ov);
+    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
 
     ov = [];
     for(getter of getters) ov.push(getter.value);
@@ -533,12 +545,12 @@ function transform(getters,func,thisArg){
   return new Getter(getTV,[getters,func,thisArg],getTY,[getters],getTF,[getters]);
 }
 
-function getTY(getters){
+function getTY(getters,...args){
   var yds = [],
       i;
 
   for(i = 0;i < getters.length;i++){
-    if(Getter.is(getters[i])) yds.push(getters[i].touched());
+    if(Getter.is(getters[i])) yds.push(getters[i].touched(...args));
     else if(Yielded.is(getters[i]) && !getters[i].done) yds.push(getters[i]);
   }
 
@@ -642,28 +654,28 @@ function getProp(){
 
 // -- throttle
 
-function getThr(timeout,that){
+function getThr(timeout,that,...args){
   var res;
 
   if(!this[resolver]){
     this[resolver] = res = new Resolver();
-    walk(throttle,[that,timeout],this);
+    walk(throttle,[that,timeout,args],this);
   }else res = this[resolver];
 
   return res.yielded;
 }
 
-function* throttle(that,timeout){
+function* throttle(that,timeout,args){
   var result,res,force,t;
 
-  force = yield that.touched();
+  force = yield that.touched(...args);
   t = wait(timeout);
 
   do{
 
     result = yield {
       timeout: t,
-      touched: that.touched()
+      touched: that.touched(...args)
     };
 
     force = force || result.touched;
@@ -677,27 +689,27 @@ function* throttle(that,timeout){
 
 // -- debounce
 
-function getDeb(timeout,that){
+function getDeb(timeout,that,...args){
   var res;
 
   if(!this[resolver]){
     this[resolver] = res = new Resolver();
-    walk(debounce,[that,timeout],this);
+    walk(debounce,[that,timeout,args],this);
   }else res = this[resolver];
 
   return res.yielded;
 }
 
-function* debounce(that,timeout){
+function* debounce(that,timeout,args){
   var result,res,force;
 
-  force = yield that.touched();
+  force = yield that.touched(...args);
 
   do{
 
     result = yield {
       timeout: wait(timeout),
-      touched: that.touched()
+      touched: that.touched(...args)
     };
 
     force = force || result.touched;
@@ -711,23 +723,23 @@ function* debounce(that,timeout){
 
 // -- precision
 
-function getPrec(prec,that){
+function getPrec(prec,that,...args){
   var res;
 
   if(!this[resolver]){
     this[resolver] = res = new Resolver();
-    walk(precision,[that,prec],this);
+    walk(precision,[that,prec,args],this);
   }else res = this[resolver];
 
   return res.yielded;
 }
 
-function* precision(that,prec){
+function* precision(that,prec,args){
   var result,res,force,ov;
 
   ov = that.value;
-  force = yield that.touched();
-  while(!force && Math.abs(ov - that.value) < prec) force = yield that.touched();
+  force = yield that.touched(...args);
+  while(!force && Math.abs(ov - that.value) < prec) force = yield that.touched(...args);
 
   res = this[resolver];
   delete this[resolver];
@@ -799,10 +811,10 @@ function getHV(getter){
   return getter.value;
 }
 
-function getHY(getter){
-  return getter.touched();
+function getHY(getter,...args){
+  return getter.touched(...args);
 }
 
-function getHF(getter){
-  return getter.frozen();
+function getHF(getter,...args){
+  return getter.frozen(...args);
 }
