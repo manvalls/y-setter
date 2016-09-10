@@ -12,6 +12,10 @@ var getY = Symbol(),
     isSetter = 'o5CqYkOh5ezPpwT',
     isGetter = '3tPmTSBio57bVrt',
 
+    defaultSetter = {
+      set: (obj,key,value) => obj[key] = value
+    },
+
     Resolver,walk,Detacher,define,wait,
     bag,Yielded;
 
@@ -288,13 +292,16 @@ Getter.prototype[define]({
     return gy[0].apply(gy[2],gy[1]);
   },
 
-  connect: function(obj,keys){
+  connect: function(obj,keys,setter){
     var d;
 
     if(keys == null) keys = ['textContent' in obj ? 'textContent' : 'value'];
     else if(typeof keys == 'string') keys = [keys];
 
-    d = this.watch(connect,obj,keys);
+    if(typeof setter == 'function') setter = {set: setter};
+    setter = setter || defaultSetter;
+
+    d = this.watch(connect,obj,keys,setter);
 
     if(Setter.is(obj) && keys.length == 1 && keys[0] == 'value'){
       this.frozen().listen(obj.freeze,[],obj);
@@ -304,13 +311,16 @@ Getter.prototype[define]({
     return d;
   },
 
-  pipe: function(obj,keys){
+  pipe: function(obj,keys,setter){
     var d;
 
     if(keys == null) keys = ['textContent' in obj ? 'textContent' : 'value'];
     else if(typeof keys == 'string') keys = [keys];
 
-    d = this.watch(pipe,obj,keys);
+    if(typeof setter == 'function') setter = {set: setter};
+    setter = setter || defaultSetter;
+
+    d = this.watch(pipe,obj,keys,setter);
     if(Setter.is(obj) && keys.length == 1 && keys[0] == 'value') obj.getter.frozen().listen(d.detach,[],d);
     return d;
   },
@@ -726,24 +736,24 @@ function* precision(that,prec){
 
 // -- connect
 
-function connect(v,ov,d,obj,keys){
+function connect(v,ov,d,obj,keys,setter){
   var i,key;
 
   for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
   key = keys[i];
 
-  if(obj[key] !== v) try{ obj[key] = v; }catch(e){}
+  if(obj[key] !== v) try{ setter.set(obj,key,v); }catch(e){}
 }
 
 // -- pipe
 
-function pipe(v,ov,d,obj,keys){
+function pipe(v,ov,d,obj,keys,setter){
   var i,key;
 
   for(i = 0;i < keys.length - 1;i++) obj = obj[keys[i]] || {};
   key = keys[i];
 
-  if(v !== undefined && obj[key] !== v) try{ obj[key] = v; }catch(e){}
+  if(v !== undefined && obj[key] !== v) try{ setter.set(obj,key,v); }catch(e){}
 }
 
 // HybridGetter
