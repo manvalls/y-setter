@@ -605,6 +605,19 @@ t('Simple transformers',function(){
     assert(!h.not.value);
   });
 
+  t('readonly',function(){
+    var h = new Hybrid(undefined),
+        ro;
+
+    assert(h.writable);
+    assert(!h.readonly.writable);
+    h.value = true;
+    assert(h.value);
+    ro = h.readonly;
+    ro.value = false;
+    assert(ro.value);
+  });
+
   t('gt',function(){
     var h = new Hybrid(undefined);
 

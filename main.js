@@ -355,6 +355,7 @@ Getter.prototype[define]({
 
   get not(){ return transform([this],invert); },
   get type(){ return transform([this],type); },
+  get readonly(){ return new Getter(...this[getV],...this[getY],...this[getF]); },
 
   is: function(v){ return transform([this,v],equal); },
   isNot: function(v){ return transform([this,v],notEqual); },
