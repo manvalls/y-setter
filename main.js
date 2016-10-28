@@ -276,15 +276,15 @@ Getter.prototype[define]({
   },
 
   throttle: function(timeout){
-    return new Getter(this[getV][0],this[getV][1],this[getV][2],getThr,[timeout,this]);
+    return new Getter(...this[getV],getThr,[timeout,this],{lastTime: 0},...this[getF]);
   },
 
   debounce: function(timeout){
-    return new Getter(this[getV][0],this[getV][1],this[getV][2],getDeb,[timeout,this]);
+    return new Getter(...this[getV],getDeb,[timeout,this],...this[getF]);
   },
 
   precision: function(prec){
-    return new Getter(this[getV][0],this[getV][1],this[getV][2],getPrec,[prec,this]);
+    return new Getter(...this[getV],getPrec,[prec,this],...this[getF]);
   },
 
   touched: function(){
@@ -658,10 +658,10 @@ function getProp(){
 function getThr(timeout,that,...args){
   var res;
 
-  if(!this[resolver]){
-    this[resolver] = res = new Resolver();
+  if(!this.resolver){
+    this.resolver = res = new Resolver();
     walk(throttle,[that,timeout,args],this);
-  }else res = this[resolver];
+  }else res = this.resolver;
 
   return res.yielded;
 }
@@ -670,7 +670,7 @@ function* throttle(that,timeout,args){
   var result,res,force,t;
 
   force = yield that.touched(...args);
-  t = wait(timeout);
+  t = wait(timeout - (Date.now() - this.lastTime));
 
   do{
 
@@ -683,9 +683,11 @@ function* throttle(that,timeout,args){
 
   }while(!('timeout' in result));
 
-  res = this[resolver];
-  delete this[resolver];
+  this.lastTime = Date.now();
+  res = this.resolver;
+  delete this.resolver;
   res.accept(force);
+
 }
 
 // -- debounce

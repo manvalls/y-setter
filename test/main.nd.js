@@ -452,6 +452,28 @@ t('\'throttle\' works',function*(){
   yield wait(10);
   assert.strictEqual(n,2);
   assert.strictEqual(value,3);
+
+  setter = new Setter();
+  getter = setter.getter.throttle(100);
+  getter.watch(v => (n++,value = v));
+  n = 0;
+
+  setter.value = 1;
+  yield wait(0);
+  assert.strictEqual(n,1);
+  assert.strictEqual(value,1);
+  setter.value = 2;
+  yield wait(0);
+  assert.strictEqual(n,1);
+  assert.strictEqual(value,1);
+  yield wait(150);
+  assert.strictEqual(n,2);
+  assert.strictEqual(value,2);
+  setter.value = 1;
+  yield wait(50);
+  assert.strictEqual(n,3);
+  assert.strictEqual(value,1);
+
 });
 
 t('\'debounce\' works',function*(){
