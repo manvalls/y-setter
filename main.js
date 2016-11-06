@@ -411,7 +411,7 @@ function* getYielded(getter){
 function through(v){ return v; }
 function retYd(){ return (new Resolver()).yielded; }
 
-// -- watchAll and glanceAll
+// -- watchAll, glanceAll and observeAll
 
 function pauseIt(w){
   w.pause();
