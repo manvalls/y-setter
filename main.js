@@ -516,7 +516,8 @@ function observeAll(getters,ov,cb){
 }
 
 function* observeAllLoop(args,d,cb,ov,getters,dArgs){
-  var v,yd,getter,update;
+  var wasTheSame = false,
+      v,yd,getter,update;
 
   dArgs[0] = this;
   while(true){
@@ -525,8 +526,9 @@ function* observeAllLoop(args,d,cb,ov,getters,dArgs){
     v = [];
     for(getter of getters) v.push(getter.value);
 
-    yd = getTY(getters);
-    if(update || !sameArray(v,ov)) walk(cb,[...v,...ov,d,...args],getters[0]);
+    yd = getTY(getters,!wasTheSame);
+    wasTheSame = sameArray(v,ov);
+    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
     ov = v;
   }
 
