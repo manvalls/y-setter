@@ -16,7 +16,7 @@ var getY = Symbol(),
       set: (obj,key,value) => obj[key] !== value ? obj[key] = value : value
     },
 
-    Resolver,walk,Detacher,define,wait,
+    Resolver,walk,Detacher,define,wait,call,
     bag,Yielded;
 
 /*/ exports /*/
@@ -443,7 +443,7 @@ function* watchAllLoop(args,d,cb,getters,dArgs){
   }
 
   yd = getTY(getters,!wasTheSame);
-  walk(cb,[...v,...ov,d,...args],getters[0]);
+  yield call(cb,[...v,...ov,d,...args],getters[0]);
   ov = v;
 
   while(true){
@@ -454,7 +454,7 @@ function* watchAllLoop(args,d,cb,getters,dArgs){
 
     yd = getTY(getters,!wasTheSame);
     wasTheSame = sameArray(v,ov);
-    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
+    if(update || !wasTheSame) yield call(cb,[...v,...ov,d,...args],getters[0]);
     ov = v;
   }
 
@@ -485,7 +485,7 @@ function* glanceAllLoop(args,d,cb,getters,dArgs){
     ov.push(undefined);
   }
 
-  walk(cb,[...v,...ov,d,...args],getters[0]);
+  yield call(cb,[...v,...ov,d,...args],getters[0]);
 
   ov = [];
   for(getter of getters) ov.push(getter.value);
@@ -496,7 +496,7 @@ function* glanceAllLoop(args,d,cb,getters,dArgs){
     v = [];
     for(getter of getters) v.push(getter.value);
     wasTheSame = sameArray(v,ov);
-    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
+    if(update || !wasTheSame) yield call(cb,[...v,...ov,d,...args],getters[0]);
 
     ov = [];
     for(getter of getters) ov.push(getter.value);
@@ -521,15 +521,16 @@ function* observeAllLoop(args,d,cb,ov,getters,dArgs){
 
   dArgs[0] = this;
   while(true){
-    update = yield yd;
-
     v = [];
     for(getter of getters) v.push(getter.value);
 
     yd = getTY(getters,!wasTheSame);
+
     wasTheSame = sameArray(v,ov);
-    if(update || !wasTheSame) walk(cb,[...v,...ov,d,...args],getters[0]);
+    if(update || !wasTheSame) yield call(cb,[...v,...ov,d,...args],getters[0]);
     ov = v;
+
+    update = yield yd;
   }
 
 }
@@ -540,6 +541,15 @@ function sameArray(a1,a2){
   if(a1.length != a2.length) return false;
   for(i = 0;i < a1.length;i++) if(a1[i] !== a2[i]) return false;
   return true;
+}
+
+call = walk.wrap(function*(cb,args,that){
+  try{ yield walk(cb,args,that); }
+  catch(e){ setTimeout(throwError,0,e); }
+});
+
+function throwError(e){
+  throw e;
 }
 
 // -- transform
