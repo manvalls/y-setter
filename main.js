@@ -351,6 +351,15 @@ Getter.prototype[define]({
 
   writable: false,
 
+  // Well-known symbols
+
+  [Symbol.iterator]: function(){
+    var arr = this.value || [];
+
+    if(arr[Symbol.iterator]) return arr[Symbol.iterator](...arguments);
+    return [][Symbol.iterator](...arguments);
+  },
+
   // Simple transforms
 
   get not(){ return transform([this],invert); },

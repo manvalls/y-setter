@@ -927,3 +927,20 @@ t('setter.update()',function(){
   setter.update();
   assert.strictEqual(n,2);
 });
+
+t('Well-known symbols',function(){
+
+  t('Symbol.iterator',function(){
+    var setter = new Setter();
+
+    setter.value = [1,2,3];
+    assert.deepStrictEqual(Array.from(setter.getter),setter.getter.value);
+
+    setter.value = null;
+    assert.deepStrictEqual(Array.from(setter.getter),[]);
+
+    setter.value = {};
+    assert.deepStrictEqual(Array.from(setter.getter),[]);
+  });
+
+});
