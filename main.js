@@ -27,6 +27,7 @@ Setter.Hybrid = Hybrid;
 Setter.is = isSetterFn;
 
 Getter.is = isGetterFn;
+Getter.get = getGetter;
 Getter.transform = transform;
 Getter.watch = watchAll;
 Getter.observe = observeAll;
@@ -402,6 +403,19 @@ Getter.prototype[define]({
 
 function isGetterFn(obj){
   return !!obj && obj[isGetter];
+}
+
+function getGetter(value){
+  var setter;
+
+  if(Getter.is(value)) return value;
+  if(Setter.is(value)) return value.getter;
+
+  setter = new Setter();
+  setter.set(value);
+  setter.freeze();
+  
+  return setter.getter;
 }
 
 function* getYielded(getter){

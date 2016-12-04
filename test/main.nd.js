@@ -944,3 +944,22 @@ t('Well-known symbols',function(){
   });
 
 });
+
+t('Getter.get()',function*(){
+  var g,setter;
+
+  g = Getter.get(5);
+  assert.strictEqual(g.value,5);
+  yield g.frozen();
+
+  setter = new Setter();
+  g = Getter.get(setter);
+  setter.value = 5;
+  assert.strictEqual(g.value,5);
+
+  setter = new Setter();
+  g = Getter.get(setter.getter);
+  setter.value = 5;
+  assert.strictEqual(g.value,5);
+
+});
