@@ -8,6 +8,7 @@ var getY = Symbol(),
     setter = Symbol(),
     resolver = Symbol(),
     parent = Symbol(),
+    path = Symbol(),
 
     isSetter = 'o5CqYkOh5ezPpwT',
     isGetter = '3tPmTSBio57bVrt',
@@ -45,11 +46,12 @@ wait = require('y-timers/wait');
 
 // Setter
 
-function Setter(){
+function Setter(st, gt, ...props){
 
-  if(Setter.is(arguments[0]) && Getter.is(arguments[1])){
-    this[setter] = arguments[0];
-    this[getter] = arguments[1];
+  if(Setter.is(st) && Getter.is(gt)){
+    this[setter] = st;
+    this[getter] = gt;
+    this[path] = props;
   }else{
 
     this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
@@ -72,9 +74,28 @@ Setter.prototype[define](bag = {
   },
 
   set value(v){
-    var ov;
+    var ov, obj, p, i;
 
-    if(this[setter]) return this[setter].value = v;
+    if(this[setter]){
+
+      p = this[path] || [];
+      if(p.length){
+
+        obj = this[setter].value;
+        for(i = 0;i < p.length - 1;i++){
+          if(obj == null) break;
+          obj = obj[p[i]];
+        }
+
+        if(obj instanceof Object && obj[p[i]] !== v){
+          obj[p[i]] = v;
+          this[setter].update();
+        }
+
+      }else this[setter].value = v;
+
+      return;
+    }
 
     if(
       (this[frozen] && this[frozen].yielded.done) ||
@@ -114,6 +135,11 @@ Setter.prototype[define](bag = {
 
   set: function(v){
     this.value = v;
+  },
+
+  get: function(){
+    if(!arguments.length) return this.value;
+    return new Hybrid(new Setter(this, this.getter.get(...arguments), ...arguments));
   },
 
   get getter(){

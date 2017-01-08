@@ -308,7 +308,7 @@ t('\'to\' works',function(){
 t('\'get\' works',function(){
   var setter = new Setter(),
       getter = setter.getter,
-      foo = getter.get('foo','foo'),
+      foo = setter.get('foo','foo'),
       yd;
 
   setter.value = {foo: {foo: 'bar'}};
@@ -320,6 +320,13 @@ t('\'get\' works',function(){
   setter.value = {foo: {foo: 'foo'}};
   assert.strictEqual(yd.done,true);
   assert.strictEqual(foo.value,'foo');
+
+  yd = getter.touched();
+  foo.value = 'bar';
+  
+  assert.strictEqual(foo.value,'bar');
+  assert.strictEqual(setter.value.foo.foo,'bar');
+  assert.strictEqual(yd.value,true);
 
   setter.value = {foo: 5};
   assert.strictEqual(foo.value,undefined);
