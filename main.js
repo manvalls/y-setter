@@ -53,13 +53,9 @@ function Setter(st, gt, ...props){
     this[getter] = gt;
     this[path] = props;
   }else{
-
     this[getter] = new Getter(getSV,[this],getSY,[this],getSF,[this]);
-    this.value = arguments[0];
-
     if(Yielded.is(arguments[0])) this[parent] = arguments[0];
     else this.value = arguments[0];
-
   }
 
 };
