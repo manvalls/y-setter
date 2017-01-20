@@ -7,6 +7,7 @@ var getY = Symbol(),
     getter = Symbol(),
     setter = Symbol(),
     resolver = Symbol(),
+    yielded = Symbol(),
     parent = Symbol(),
     path = Symbol(),
 
@@ -600,7 +601,15 @@ function throwError(e){
 
 // -- transform
 
-function transform(getters,func,thisArg){
+function transform(args,func,thisArg){
+  var getters = [],
+      i;
+
+  for(i = 0;i < args.length;i++){
+    if(args[i] && typeof args[i].then == 'function') getters[i] = Yielded.get(args[i]);
+    else getters[i] = args[i];
+  }
+
   return new Getter(getTV,[getters,func,thisArg],getTY,[getters],getTF,[getters]);
 }
 
@@ -610,7 +619,7 @@ function getTY(getters,...args){
 
   for(i = 0;i < getters.length;i++){
     if(Getter.is(getters[i])) yds.push(getters[i].touched(...args));
-    else if(Yielded.is(getters[i]) && !getters[i].done) yds.push(getters[i]);
+    else if(Yielded.is(getters[i]) && !getters[i].done) yds.push(getYieldedYd(getters[i]));
   }
 
   return Resolver.race(yds);
@@ -637,6 +646,15 @@ function getTF(getters){
   }
 
   return Resolver.all(yds);
+}
+
+function getYieldedYd(yd){
+  var res;
+
+  if(yd[yielded]) return yd[yielded];
+  res = new Resolver();
+  yd.listen(res.accept,[],res);
+  return yd[yielded] = res.yielded;
 }
 
 // -- Simple transforms
