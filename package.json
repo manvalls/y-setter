@@ -2,7 +2,7 @@
   "name": "y-setter",
   "version": "6.16.2",
   "description": "Properties on which you can listen for changes",
-  "main": "main.js",
+  "main": "main",
   "dependencies": {
     "detacher": "^2.0.4",
     "u-proto": "^7.0.1",

@@ -1,4 +1,4 @@
-var Getter = require('./main.js').Getter;
+var Getter = require('./main').Getter;
 
 function concat(){
   return Getter.transform(arguments,concatTf);

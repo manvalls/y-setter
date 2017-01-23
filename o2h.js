@@ -1,4 +1,4 @@
-var Setter = require('./main.js');
+var Setter = require('./main');
 
 function o2h(obj,Constructor){
   var ret = {},

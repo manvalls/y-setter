@@ -4,7 +4,7 @@ var t = require('u-test'),
     Resolver = require('y-resolver'),
     wait = require('y-timers/wait'),
     walk = require('y-walk'),
-    Setter = require('../main.js'),
+    Setter = require('../main'),
     o2h = require('../o2h.js'),
     h2o = require('../h2o.js'),
     Getter = Setter.Getter,
@@ -306,10 +306,14 @@ t('\'to\' works',function(){
 });
 
 t('\'get\' works',function(){
-  var setter = new Setter(),
+  var setter = new Hybrid(),
       getter = setter.getter,
       foo = setter.get('foo','foo'),
       yd;
+
+  assert.strictEqual(setter.setter['3asKNsYzcdGduft'], 55);
+  assert.strictEqual(setter.getter['3asKNsYzcdGduft'], 54);
+  assert.strictEqual(setter['3asKNsYzcdGduft'], 56);
 
   setter.value = {foo: {foo: 'bar'}};
   assert.strictEqual(foo.value,'bar');
@@ -317,13 +321,17 @@ t('\'get\' works',function(){
   yd = foo.touched();
   assert.strictEqual(yd.done,false);
 
-  setter.value = {foo: {foo: 'foo'}};
+  setter.set({foo: {foo: 'foo'}});
   assert.strictEqual(yd.done,true);
   assert.strictEqual(foo.value,'foo');
 
   yd = getter.touched();
-  foo.value = 'bar';
-  
+  foo.touch();
+  assert(yd.done);
+
+  yd = getter.touched();
+  foo.setter.value = 'bar';
+
   assert.strictEqual(foo.value,'bar');
   assert.strictEqual(setter.value.foo.foo,'bar');
   assert.strictEqual(yd.value,true);
@@ -332,6 +340,10 @@ t('\'get\' works',function(){
   assert.strictEqual(foo.value,undefined);
   setter.value = {bar: 5};
   assert.strictEqual(foo.value,undefined);
+
+  foo.freeze();
+  assert(foo.frozen().done);
+
 });
 
 t('\'watch\' works',function*(){
@@ -517,21 +529,6 @@ t('\'precision\' works',function*(){
   assert.strictEqual(value,3);
 });
 
-t('Getter constructor',function(){
-  var yd = (new Resolver()).yielded,
-      n = 0,
-      g = new Setter.Getter(
-        function(){ return n = n + 1; },
-        function(){ return yd; }
-      ),
-      tc,v;
-
-  tc = g.touched();
-  assert.notStrictEqual(g.value,g.value);
-  assert(!tc.done);
-
-});
-
 t('valueOf',function(){
   var h1 = new Hybrid(1),
       h2 = new Hybrid(2),
@@ -577,9 +574,12 @@ t('Simple transformers',function(){
     var h = new Hybrid(undefined);
 
     assert(h.is(null).value);
+    assert(h.isNull.value);
     assert(h.is(undefined).value);
 
     h.value = 5;
+    assert(h.isNotNull.value);
+    assert(h.void.isNull.value);
     assert(h.is(5).value);
     assert(h.is('5').value);
   });
@@ -786,7 +786,7 @@ t('Simple transformers',function(){
 });
 
 t('One-argument constructor',function(){
-  var getter = Getter(5);
+  var getter = new Getter(5);
 
   assert.strictEqual(getter.value,5);
   assert(!getter.touched().done);
@@ -831,16 +831,6 @@ t('"freeze" and "frozen"',function*(){
   assert.strictEqual(h.value,'foo');
   assert(h.frozen().done);
 
-  g = new Getter(() => 5,() => (new Resolver()).yielded,() => Resolver.accept());
-  assert(g.frozen().done);
-  assert(!g.touched().done);
-  assert.strictEqual(g.value,5);
-
-  g = new Getter(() => 5,() => (new Resolver()).yielded);
-  assert(!g.frozen().done);
-  assert(!g.touched().done);
-  assert.strictEqual(g.value,5);
-
   s1 = new Setter(0);
   s2 = new Setter(1);
   joined = s1.getter.pl(s2.getter).pl(2);
@@ -882,8 +872,8 @@ t('"freeze" and "frozen"',function*(){
 });
 
 t('Delegation',function*(){
-  var ds = new Setter(0),
-      ss = new Setter(1),
+  var ds = new Hybrid(0),
+      ss = new Hybrid(1),
       setter = new Setter(ds,ss.getter),
       yd;
 
@@ -925,7 +915,7 @@ t('o2h & h2o',function(){
 });
 
 t('setter.update()',function(){
-  var setter = new Setter(),
+  var setter = new Hybrid(),
       n = 0;
 
   setter.update();
@@ -938,7 +928,7 @@ t('setter.update()',function(){
 t('Well-known symbols',function(){
 
   t('Symbol.iterator',function(){
-    var setter = new Setter();
+    var setter = new Hybrid();
 
     setter.value = [1,2,3];
     assert.deepStrictEqual(Array.from(setter.getter),setter.getter.value);
