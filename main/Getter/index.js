@@ -173,6 +173,7 @@ class Getter{
   call(){ return this.to(trn.call, ...arguments); }
   run(){ return this.to(trn.run, ...arguments); }
   math(){ return this.to(trn.math, ...arguments); }
+  map(){ return this.to(...arguments); }
 
   // ebjs label
 
