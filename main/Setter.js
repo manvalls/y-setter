@@ -24,6 +24,8 @@ class Setter{
   }
 
   freeze(){
+    var Resolver = require('y-resolver');
+    this[getter][frozen] = this[getter][frozen] || new Resolver();
     this[getter][frozen].accept();
   }
 
@@ -90,10 +92,7 @@ class Setter{
 class SettedGetter extends Getter{
 
   constructor(v){
-    var Resolver = require('y-resolver');
-
     super();
-    this[frozen] = new Resolver();
     this[value] = v;
   }
 
@@ -108,6 +107,8 @@ class SettedGetter extends Getter{
   }
 
   frozen(){
+    var Resolver = require('y-resolver');
+    this[frozen] = this[frozen] || new Resolver();
     return this[frozen].yielded;
   }
 
