@@ -146,6 +146,31 @@ class Getter{
   get isNotNull(){ return this.isNot(null); }
   get void(){ return new Getter(); }
 
+  get done(){
+    var YieldedGetter = require('../YieldedGetter');
+    return new YieldedGetter(this, 'done');
+  }
+
+  get success(){
+    var YieldedGetter = require('../YieldedGetter');
+    return new YieldedGetter(this, 'accepted');
+  }
+
+  get failure(){
+    var YieldedGetter = require('../YieldedGetter');
+    return new YieldedGetter(this, 'rejected');
+  }
+
+  get result(){
+    var YieldedGetter = require('../YieldedGetter');
+    return new YieldedGetter(this, 'value');
+  }
+
+  get error(){
+    var YieldedGetter = require('../YieldedGetter');
+    return new YieldedGetter(this, 'error');
+  }
+
   is(v){ return this.to(trn.equal, v); }
   isNot(v){ return this.to(trn.notEqual, v); }
   equals(v){ return this.to(trn.strictEqual, v); }

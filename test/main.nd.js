@@ -960,3 +960,31 @@ t('Getter.get()',function*(){
   assert.strictEqual(g.value,5);
 
 });
+
+t('Promise helpers',function*(){
+  var h = new Hybrid(),
+      res, touched;
+
+  h.value = Resolver.accept('foo');
+
+  yield h.done;
+  yield h.success;
+  yield h.failure.not;
+  yield h.result.is('foo');
+  yield h.error.isNull;
+
+  h.value = 1;
+  yield touched;
+
+  touched = h.done.touched();
+  res = new Resolver();
+  h.value = res.yielded;
+  yield touched;
+
+  touched = h.done.touched();
+  res.accept();
+  yield touched;
+
+  h.freeze();
+  yield h.done.frozen();
+});
