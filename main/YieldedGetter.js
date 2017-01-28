@@ -1,6 +1,5 @@
 var Resolver = require('y-resolver'),
     {Yielded} = Resolver,
-    getYielded = require('./getters/getYielded'),
     Getter = require('./Getter'),
     parent = Symbol(),
     property = Symbol();
@@ -18,7 +17,7 @@ class YieldedGetter extends Getter{
   }
 
   touched(){
-    var yd = getYielded(Yielded.get(this[parent].value));
+    var yd = Resolver.after(Yielded.get(this[parent].value));
     if(!yd.done) return Resolver.race([this[parent].touched(), yd]);
     return this[parent].touched();
   }
