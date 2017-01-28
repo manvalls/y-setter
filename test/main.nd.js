@@ -442,7 +442,7 @@ t('watch vs glance',function*(){
   conn.detach();
   setter.value = 0;
 
-  (g = getter.to( v => parseInt(v) )).glance(cb = Cb(function(v){
+  (g = Getter.map([getter], v => parseInt(v) )).glance(cb = Cb(function(v){
     if(v < 5) setter.value++;
   }));
 

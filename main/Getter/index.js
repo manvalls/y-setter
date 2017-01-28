@@ -23,6 +23,10 @@ class Getter{
     return new TransformedGetter(...arguments);
   }
 
+  static map(){
+    return Getter.transform(...arguments);
+  }
+
   static watch(){
     return require('./watchers/watch')(...arguments);
   }
