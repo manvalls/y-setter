@@ -1,6 +1,6 @@
 {
   "name": "y-setter",
-  "version": "7.3.4",
+  "version": "7.4.0",
   "description": "Properties on which you can listen for changes",
   "main": "main",
   "dependencies": {
