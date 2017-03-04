@@ -134,6 +134,11 @@ class Getter{
     return new DebouncedGetter(this, ...arguments);
   }
 
+  bounce(){
+    var BouncedGetter = require('../BouncedGetter');
+    return new BouncedGetter(this, ...arguments);
+  }
+
   precision(){
     var ImpreciseGetter = require('../ImpreciseGetter');
     return new ImpreciseGetter(this, ...arguments);

@@ -513,6 +513,21 @@ t('\'debounce\' works',function*(){
   assert.strictEqual(value,3);
 });
 
+t('\'bounce\' works',function*(){
+  var setter = new Setter(),
+      getter = setter.getter.bounce(),
+      n,value;
+
+  getter.watch(v => (n++,value = v));
+
+  n = 0;
+  setter.value = 1;
+
+  yield wait(100);
+  assert.strictEqual(n,2);
+  assert.strictEqual(value,1);
+});
+
 t('\'precision\' works',function*(){
   var setter = new Hybrid(),
       getter = setter.precision(2),
