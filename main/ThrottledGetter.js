@@ -1,6 +1,6 @@
 var Resolver = require('y-resolver'),
     walk = require('y-walk'),
-    wait = require('y-timers/wait'),
+    {wait, frame} = require('y-timers'),
     ChildGetter = require('./ChildGetter'),
     timeout = Symbol(),
     yielded = Symbol(),
@@ -29,7 +29,7 @@ function* handler(){
   var result,force,t;
 
   force = yield this[touched]();
-  t = wait(this[timeout] - (Date.now() - this[lastTime]));
+  t = this[timeout] == null ? frame() : wait(this[timeout] - (Date.now() - this[lastTime]));
 
   do{
 
