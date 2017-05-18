@@ -55,7 +55,13 @@ class Setter{
   // Common methods
 
   update(){
+
+    if(arguments.length > 0 && !this.getter.frozen().done){
+      this[getter][value] = arguments[0];
+    }
+
     this.touch(true);
+
   }
 
   set(value){
