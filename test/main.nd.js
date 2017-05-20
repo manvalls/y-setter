@@ -185,7 +185,7 @@ t('\'pipe\' works',function(){
 t('\'to\' works',function(){
 
   t('Single getter',function(){
-    var dest = getter.map(function(n){ return Math.floor(n + 1); });
+    var dest = getter.forward(function(n){ return Math.floor(n + 1); });
 
     t('Value propagates',function(){
       setter.value = 0;

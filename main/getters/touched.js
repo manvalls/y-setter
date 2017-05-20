@@ -1,10 +1,11 @@
 var Resolver = require('y-resolver'),
+    walk = require('y-walk'),
     Getter = require('../Getter'),
     Yielded = Resolver.Yielded;
 
-module.exports = getters => {
+module.exports = walk.wrap(function*(getters, doNotForward){
   var yds = [],
-      i;
+      result, i;
 
   for(i = 0;i < getters.length;i++){
 
@@ -16,5 +17,7 @@ module.exports = getters => {
 
   }
 
-  return Resolver.race(yds);
-};
+  result = yield Resolver.race(yds);
+  if(doNotForward) return false;
+  return result;
+});

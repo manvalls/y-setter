@@ -6,9 +6,9 @@ var Getter = require('./Getter'),
 
 class TransformedGetter extends Getter{
 
-  constructor(getters, transformation, thisArg){
+  constructor(getters, transformation, thisArg, doNotForward){
     super();
-    this[args] = {getters, transformation, thisArg};
+    this[args] = {getters, transformation, thisArg, doNotForward};
   }
 
   get value(){
@@ -17,8 +17,8 @@ class TransformedGetter extends Getter{
   }
 
   touched(){
-    var {getters} = this[args];
-    return touched(getters);
+    var {getters, doNotForward} = this[args];
+    return touched(getters, doNotForward);
   }
 
   frozen(){

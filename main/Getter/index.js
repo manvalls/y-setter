@@ -18,9 +18,14 @@ class Getter{
     return new Getter(value);
   }
 
-  static transform(){
+  static transform(getters, transformation, thisArg){
     var TransformedGetter = require('../TransformedGetter');
-    return new TransformedGetter(...arguments);
+    return new TransformedGetter(getters, transformation, thisArg, true);
+  }
+
+  static forward(getters, transformation, thisArg){
+    var TransformedGetter = require('../TransformedGetter');
+    return new TransformedGetter(getters, transformation, thisArg, false);
   }
 
   static map(){
@@ -117,6 +122,14 @@ class Getter{
 
     for(i = 1;i < arguments.length;i++) getters.push(arguments[i]);
     return Getter.transform(getters, fn, this);
+  }
+
+  forward(fn){
+    var getters = [this],
+        i;
+
+    for(i = 1;i < arguments.length;i++) getters.push(arguments[i]);
+    return Getter.forward(getters, fn, this);
   }
 
   get(){
