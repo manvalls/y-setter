@@ -319,7 +319,6 @@ t('\'get\' works',function(){
   assert.strictEqual(foo.value,'bar');
 
   yd = foo.touched();
-  console.log(yd);
   assert.strictEqual(yd.done,false);
 
   setter.update({foo: {foo: 'foo'}});
