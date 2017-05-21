@@ -3,6 +3,7 @@ var Detacher = require('detacher'),
     pause = require('./pause'),
     same = require('./same'),
     call = require('./call'),
+    frozen = require('../../getters/frozen'),
     touched = require('../../getters/touched');
 
 function observe(getters,ov,cb){
@@ -13,6 +14,7 @@ function observe(getters,ov,cb){
 
   for(i = 3;i < arguments.length;i++) args.push(arguments[i])
   walk(loop,[args,d,cb,ov,getters,dArgs]);
+  frozen(getters).add(d);
   return d;
 }
 
