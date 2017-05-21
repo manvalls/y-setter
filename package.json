@@ -5,14 +5,14 @@
   "main": "main",
   "dependencies": {
     "detacher": "^2.0.10",
-    "u-proto": "^7.1.4",
-    "y-resolver": "^10.0.1",
-    "y-timers": "^1.1.6",
-    "y-walk": "^10.0.7"
+    "u-proto": "^7.1.6",
+    "y-resolver": "^10.1.4",
+    "y-timers": "^1.1.10",
+    "y-walk": "^10.0.9"
   },
   "devDependencies": {
     "u-test": "^3.8.11",
-    "y-callback": "^1.2.4"
+    "y-callback": "^1.2.5"
   },
   "scripts": {
     "test": "u-test"
