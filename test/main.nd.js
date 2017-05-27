@@ -1013,6 +1013,9 @@ t('Normalization',function*(){
     }
   };
 
+  assert(Getter.inside(obj));
+  assert(!Getter.inside({foo: 'bar'}));
+
   var normalized = new Hybrid();
 
   normalized.value = obj;

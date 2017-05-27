@@ -49,6 +49,21 @@ class Getter{
     return require('./watchers/glance')(...arguments);
   }
 
+  static inside(obj){
+
+    if(Getter.is(obj)) return true;
+
+    if(obj instanceof Object && (obj.constructor == Array || obj.constructor == Object)){
+
+      for(let value of Object.values(obj)){
+        if(Getter.inside(value)) return true;
+      }
+
+    }
+
+    return false;
+  }
+
   // Default behaviour
 
   constructor(v){
