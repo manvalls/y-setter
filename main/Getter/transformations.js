@@ -64,3 +64,7 @@ exports.call = function(){
   for(i = 1;i < arguments.length;i++) args.push(arguments[i]);
   return func.apply(this,args);
 };
+
+exports.resc = function(v){
+  return (v + '').replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};

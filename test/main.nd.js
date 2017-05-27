@@ -798,6 +798,11 @@ t('Simple transformers',function(){
     assert.strictEqual(h.math('min',500).value,4);
   });
 
+  t('resc',function(){
+    var h = new Hybrid('asdasd|asdasd');
+    assert.strictEqual(h.resc.value, 'asdasd\\|asdasd');
+  });
+
 });
 
 t('One-argument constructor',function(){

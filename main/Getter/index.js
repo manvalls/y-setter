@@ -244,6 +244,7 @@ class Getter{
   call(){ return this.to(trn.call, ...arguments); }
   run(){ return this.to(trn.run, ...arguments); }
   math(){ return this.to(trn.math, ...arguments); }
+  get resc(){ return this.to(trn.resc); }
   map(){ return this.to(...arguments); }
 
   // ebjs label
