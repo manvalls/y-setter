@@ -28,6 +28,11 @@ class Getter{
     return new TransformedGetter(getters, transformation, thisArg, false);
   }
 
+  static normalize(obj){
+    var NormalizedGetter = require('../NormalizedGetter');
+    return new NormalizedGetter(obj);
+  }
+
   static map(){
     return Getter.transform(...arguments);
   }
@@ -130,6 +135,10 @@ class Getter{
 
     for(i = 1;i < arguments.length;i++) getters.push(arguments[i]);
     return Getter.forward(getters, fn, this);
+  }
+
+  normalize(){
+    return Getter.normalize(this);
   }
 
   get(){

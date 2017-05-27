@@ -1003,3 +1003,59 @@ t('Promise helpers',function*(){
   h.freeze();
   yield h.done.frozen();
 });
+
+t('Normalization',function*(){
+  var obj = {
+    foo: new Hybrid(),
+    bar: {
+      foo: new Hybrid(),
+      arr: [new Hybrid(), new Hybrid()]
+    }
+  };
+
+  var normalized = new Hybrid();
+
+  normalized.value = obj;
+  normalized = normalized.normalize();
+
+  assert.deepEqual(normalized.value, {
+    foo: undefined,
+    bar: {
+      foo: undefined,
+      arr: [undefined, undefined]
+    }
+  });
+
+  var touched = normalized.touched();
+
+  obj.foo.value = 'bar';
+  yield touched;
+
+  assert.deepEqual(normalized.value, {
+    foo: 'bar',
+    bar: {
+      foo: undefined,
+      arr: [undefined, undefined]
+    }
+  });
+
+  touched = normalized.touched();
+  obj.bar.arr[0].value = 'baz';
+  yield touched;
+
+  assert.deepEqual(normalized.value, {
+    foo: 'bar',
+    bar: {
+      foo: undefined,
+      arr: ['baz', undefined]
+    }
+  });
+
+  touched = normalized.touched();
+  obj.foo.value = obj;
+  yield touched;
+  let data = normalized.get();
+
+  assert.strictEqual(data, data.foo);
+
+});
