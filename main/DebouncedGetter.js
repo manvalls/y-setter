@@ -2,6 +2,7 @@ var Resolver = require('y-resolver'),
     walk = require('y-walk'),
     {wait, frame} = require('y-timers'),
     ChildGetter = require('./ChildGetter'),
+    value = Symbol(),
     timeout = Symbol(),
     yielded = Symbol(),
     touched = Symbol();
@@ -14,7 +15,18 @@ class DebouncedGetter extends ChildGetter{
   }
 
   touched(){
-    return this[yielded] = this[yielded] || walk(handler, [], this);
+
+    if(!this[yielded]){
+      this[value] = this.value;
+      this[yielded] = walk(handler, [], this);
+    }
+
+    return this[yielded];
+  }
+
+  get value(){
+    if(this[yielded]) return this[value];
+    return super.value;
   }
 
   [touched](){
@@ -40,6 +52,7 @@ function* handler(){
   }while(!('timeout' in result));
 
   delete this[yielded];
+  delete this[value];
   return force;
 }
 
