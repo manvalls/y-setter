@@ -23,6 +23,8 @@ class YieldedGetter extends Getter{
   }
 
   frozen(){
+    var yd = Resolver.after(Yielded.get(this[parent].value));
+    if(!yd.done) return Resolver.all([this[parent].frozen(), yd]);
     return this[parent].frozen();
   }
 
