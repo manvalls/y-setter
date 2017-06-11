@@ -87,6 +87,8 @@ class Setter{
 
   get writable(){ return true; }
 
+  get writeonly(){ return this; }
+
   // ebjs label
 
   get ['3asKNsYzcdGduft'](){ return 55; }
@@ -158,6 +160,7 @@ class HybridGetter extends ChildGetter{
   update(){ return this[setter].update(...arguments); }
   set(){ return this[setter].set(...arguments); }
   get(){ return this[setter].get(...arguments); }
+  get writeonly(){ return this[setter]; }
   get [isSetter](){ return true; }
 
   get writable(){ return true; }

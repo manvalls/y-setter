@@ -22,7 +22,7 @@ t('Value propagates from setter to getter',function(){
 
   for(i = 0;i < values.length;i++){
     assert.strictEqual(setter.value,getter.value);
-    setter.value = values[i];
+    setter.writeonly.value = values[i];
   }
 
   assert.strictEqual(setter.value,getter.get());
@@ -311,7 +311,7 @@ t('\'get\' works',function(){
       foo = setter.get('foo','foo'),
       yd;
 
-  assert.strictEqual(setter.setter['3asKNsYzcdGduft'], 55);
+  assert.strictEqual(setter.writeonly['3asKNsYzcdGduft'], 55);
   assert.strictEqual(setter.getter['3asKNsYzcdGduft'], 54);
   assert.strictEqual(setter['3asKNsYzcdGduft'], 56);
 
