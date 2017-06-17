@@ -33,7 +33,7 @@ class ImpreciseGetter extends ChildGetter{
     return super.touched();
   }
 
-  get [value](){
+  [value](){
     return super.value;
   }
 
@@ -41,7 +41,7 @@ class ImpreciseGetter extends ChildGetter{
 
 function* handler(){
   yield this[touched]();
-  while(Math.abs(this.value - this[value]) < this[precision]) yield this[touched]();
+  while(Math.abs(this.value - this[value]()) < this[precision]) yield this[touched]();
   delete this[lastValue];
   delete this[yielded];
 }
