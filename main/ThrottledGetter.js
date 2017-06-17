@@ -2,7 +2,7 @@ var Resolver = require('y-resolver'),
     walk = require('y-walk'),
     {wait, frame} = require('y-timers'),
     ChildGetter = require('./ChildGetter'),
-    value = Symbol(),
+    lastValue = Symbol(),
     timeout = Symbol(),
     yielded = Symbol(),
     touched = Symbol(),
@@ -19,16 +19,16 @@ class ThrottledGetter extends ChildGetter{
   touched(){
 
     if(!this[yielded]){
-      this[value] = this.value;
-      this[yielded] = walk(handler, [], this);
+      this[lastValue] = super.value;
+      this[yielded] = walk.onDemand(handler, [], this);
     }
 
     return this[yielded];
   }
 
   get value(){
-    if(this[yielded]) return this[value];
-    return super.value;
+    this.touched();
+    return this[lastValue];
   }
 
   [touched](){
@@ -38,9 +38,9 @@ class ThrottledGetter extends ChildGetter{
 }
 
 function* handler(){
-  var result,force,t;
+  var result,t;
 
-  force = yield this[touched]();
+  yield this[touched]();
   t = this[timeout] == null ? frame() : wait(this[timeout] - (Date.now() - this[lastTime]));
 
   do{
@@ -50,14 +50,11 @@ function* handler(){
       touched: this[touched]()
     };
 
-    force = force || result.touched;
-
   }while(!('timeout' in result));
 
   this[lastTime] = Date.now();
+  delete this[lastValue];
   delete this[yielded];
-  delete this[value];
-  return force;
 }
 
 /*/ exports /*/

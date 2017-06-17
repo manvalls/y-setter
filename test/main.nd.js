@@ -587,16 +587,23 @@ t('Simple transformers',function(){
 
   t('is',function(){
     var h = new Hybrid(undefined);
+    var isNull;
+
+    h.isNull.watch((v) => {
+      isNull = v;
+    });
 
     assert(h.is(null).value);
     assert(h.isNull.value);
     assert(h.is(undefined).value);
+    assert(isNull);
 
     h.value = 5;
     assert(h.isNotNull.value);
     assert(h.void.isNull.value);
     assert(h.is(5).value);
     assert(h.is('5').value);
+    assert(!isNull);
   });
 
   t('isNot',function(){

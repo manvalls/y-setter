@@ -2,6 +2,8 @@ var Resolver = require('y-resolver'),
     walk = require('y-walk'),
     ChildGetter = require('./ChildGetter'),
     precision = Symbol(),
+    value = Symbol(),
+    lastValue = Symbol(),
     yielded = Symbol(),
     touched = Symbol();
 
@@ -13,24 +15,35 @@ class ImpreciseGetter extends ChildGetter{
   }
 
   touched(){
-    return this[yielded] = this[yielded] || walk(handler, [], this);
+
+    if(!this[yielded]){
+      this[lastValue] = super.value;
+      this[yielded] = walk.onDemand(handler, [], this);
+    }
+
+    return this[yielded];
+  }
+
+  get value(){
+    this.touched();
+    return this[lastValue];
   }
 
   [touched](){
     return super.touched();
   }
 
+  get [value](){
+    return super.value;
+  }
+
 }
 
 function* handler(){
-  var force,ov;
-
-  ov = this.value;
-  force = yield this[touched]();
-  while(!force && Math.abs(ov - this.value) < this[precision]) force = yield this[touched]();
-
+  yield this[touched]();
+  while(Math.abs(this.value - this[value]) < this[precision]) yield this[touched]();
+  delete this[lastValue];
   delete this[yielded];
-  return force;
 }
 
 /*/ exports /*/

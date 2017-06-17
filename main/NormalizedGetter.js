@@ -1,6 +1,11 @@
 var Getter = require('./Getter'),
     frozen = require('./getters/frozen'),
     touched = require('./getters/touched'),
+    walk = require('y-walk'),
+    lastValue = Symbol(),
+    lastGetters = Symbol(),
+    frozenYd = Symbol(),
+    yielded = Symbol(),
     object = Symbol();
 
 class NormalizedGetter extends Getter{
@@ -10,27 +15,35 @@ class NormalizedGetter extends Getter{
     this[object] = obj;
   }
 
-  get value(){
-    var wm = new WeakMap();
-    return extract(this[object], wm);
+  touched(){
+
+    if(!this[yielded]){
+      this[lastGetters] = [];
+      fillGetters(this[object], this[lastGetters], new WeakSet());
+
+      this[lastValue] = extract(this[object], new WeakMap());
+      this[yielded] = touched(this[lastGetters]);
+      this[yielded].listen(cleanup, [], this);
+    }
+
+    return this[yielded];
   }
 
-  touched(){
-    var getters = [],
-        ws = new WeakSet();
-
-    fillGetters(this[object], getters, ws);
-    return touched(getters);
+  get value(){
+    this.touched();
+    return this[lastValue];
   }
 
   frozen(){
-    var getters = [],
-        ws = new WeakSet();
-
-    fillGetters(this[object], getters, ws);
-    return frozen(getters);
+    return this[frozenYd] = this[frozenYd] || walk.onDemand(handleFrozen, [], this);
   }
 
+}
+
+function cleanup(){
+  delete this[lastGetters];
+  delete this[lastValue];
+  delete this[yielded];
 }
 
 function fillGetters(obj, getters, ws){
@@ -82,6 +95,21 @@ function extract(obj, wm){
   }
 
   return obj;
+}
+
+function* handleFrozen(){
+  var touched = this.touched();
+
+  while(true){
+    let result = yield {
+      touched: touched,
+      frozen: frozen(this[lastGetters])
+    };
+
+    if('frozen' in result) return;
+    touched = this.touched();
+  }
+
 }
 
 /*/ exports /*/
