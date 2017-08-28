@@ -74,6 +74,10 @@ class Getter{
     return this[value];
   }
 
+  get v(){
+    return this.value;
+  }
+
   touched(){
     var {Yielded} = require('y-resolver');
     return new Yielded();

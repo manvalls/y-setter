@@ -73,6 +73,14 @@ class Setter{
     return new HybridGetter(new SetterWithPath(this, ...arguments));
   }
 
+  set v(v){
+    this.value = v;
+  }
+
+  get v(){
+    return this.value;
+  }
+
   get value(){
     return this.getter.value;
   }

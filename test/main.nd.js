@@ -21,7 +21,7 @@ t('Value propagates from setter to getter',function(){
       i;
 
   for(i = 0;i < values.length;i++){
-    assert.strictEqual(setter.value,getter.value);
+    assert.strictEqual(setter.v,getter.value);
     setter.writeonly.value = values[i];
   }
 
@@ -40,7 +40,7 @@ t('Getter is not writable',function(){
   var v;
 
   assert(!getter.writable);
-  v = getter.value;
+  v = getter.v;
   getter.value = {};
   assert.strictEqual(getter.value,v);
 });
@@ -52,7 +52,7 @@ t('\'touched\' works',function(){
   yd = getter.touched();
   setter.value = 0;
   assert(!yd.done);
-  setter.value = 1;
+  setter.v = 1;
   assert(yd.done);
 
 });
@@ -68,7 +68,7 @@ t('\'connect\' works',function(){
     assert.strictEqual(o3.foo.bar,getter.value);
 
     setter.value = {};
-    assert.strictEqual(o3.foo.bar,getter.value);
+    assert.strictEqual(o3.foo.bar,getter.v);
 
     d.detach();
     setter.value = {};
