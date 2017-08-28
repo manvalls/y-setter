@@ -253,7 +253,7 @@ class Getter{
 
   // ebjs label
 
-  get ['3asKNsYzcdGduft'](){ return 54; }
+  get [Symbol.for('ebjs/label')](){ return 54; }
 
 }
 

@@ -99,7 +99,7 @@ class Setter{
 
   // ebjs label
 
-  get ['3asKNsYzcdGduft'](){ return 55; }
+  get [Symbol.for('ebjs/label')](){ return 55; }
 
 }
 
@@ -172,7 +172,7 @@ class HybridGetter extends ChildGetter{
   get [isSetter](){ return true; }
 
   get writable(){ return true; }
-  get ['3asKNsYzcdGduft'](){ return 56; }
+  get [Symbol.for('ebjs/label')](){ return 56; }
 
 }
 
