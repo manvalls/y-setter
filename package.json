@@ -6,7 +6,7 @@
   "dependencies": {
     "detacher": "^2.0.10",
     "u-proto": "^7.1.8",
-    "y-resolver": "^10.1.6",
+    "y-resolver": "^11.0.0",
     "y-timers": "^1.1.10",
     "y-walk": "^10.1.0"
   },
